@@ -1,0 +1,94 @@
+{
+  "meta": {
+    "probe": "env_probe",
+    "note": "calibre license var unverified by design; first DRC doubles as discovery"
+  },
+  "results": [
+    {
+      "check": "host.vpn-route",
+      "ok": true,
+      "detail": "default via 172.20.30.1 dev wlp8s0 proto dhcp src 172.20.30.150 metric 600 \n10.8.0.1 via 10.8.0.121 dev tun0 \n10.8.0.121 dev tun0 proto kernel scope link src 10.8.0.122 \n10.180.60.101 via 10.8.0.121 d"
+    },
+    {
+      "check": "license.cadence-dli",
+      "ok": true,
+      "detail": "10.180.60.103:5280"
+    },
+    {
+      "check": "license.siemens-dli",
+      "ok": true,
+      "detail": "10.180.60.101:1717"
+    },
+    {
+      "check": "license.synopsys-dli",
+      "ok": true,
+      "detail": "10.180.60.102:27020"
+    },
+    {
+      "check": "license.keysight-eda",
+      "ok": true,
+      "detail": "10.180.60.104:27009"
+    },
+    {
+      "check": "vm.ssh",
+      "ok": true,
+      "detail": "samjna.asnaviram"
+    },
+    {
+      "check": "vm.ads2027-dir",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "check": "vm.hpeesofsim-version",
+      "ok": true,
+      "detail": "Detected locale \"C\" with character encoding \"ANSI_X3.4-1968\", which is not UTF-8. Qt depends on a UT"
+    },
+    {
+      "check": "vm.momentum-wrapper",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "check": "vm.spectre",
+      "ok": true,
+      "detail": "@(#)$CDS: spectre version 25.1.0 64bit 07/16/2025 20:59 (mmsimcm36c-2) $"
+    },
+    {
+      "check": "vm.virtuoso",
+      "ok": true,
+      "detail": "@(#)$CDS: virtuoso version IC25.1-64b 06/17/2025 18:21 (cpgbld31) $"
+    },
+    {
+      "check": "vm.calibre",
+      "ok": true,
+      "detail": "WARNING: Software tree location not set or invalid, using $CALIBRE_HOME=/opt/siemens/calibre // Calibre v2026.3_27.19 Thu Aug 6 14:59:14 PDT 2026"
+    },
+    {
+      "check": "vm.sg13g2-ads-models",
+      "ok": true,
+      "detail": "~/linht/ads/pdk/sg13g2_tt.net"
+    },
+    {
+      "check": "vm.psp103-veriloga",
+      "ok": true,
+      "detail": "~/linht/ads/pdk/va/psp103.va"
+    },
+    {
+      "check": "container.ngspice",
+      "ok": true,
+      "detail": "** ngspice-46 : Circuit level simulation program"
+    },
+    {
+      "check": "container.pdk",
+      "ok": true,
+      "detail": "ok"
+    },
+    {
+      "check": "container.repo-rw",
+      "ok": true,
+      "detail": "ok"
+    }
+  ],
+  "ok": true
+}

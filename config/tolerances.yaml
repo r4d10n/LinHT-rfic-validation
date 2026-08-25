@@ -1,0 +1,25 @@
+# Cross-simulator comparison tolerances.
+# Each entry: metric-family -> absolute/relative bounds for PASS between a
+# commercial simulator and the ngspice reference of record.
+# Add entries with a comment stating why; never inline tolerances in harnesses.
+
+dc_operating:
+  v:            {abs: 5.0e-3}          # node voltages, 5 mV — model-level agreement on same netlist
+  i:            {rel: 0.02, abs_min_a: 1.0e-9}   # currents 2% or sub-nA when near zero
+
+transient:
+  freq_hz:      {rel: 0.005}           # oscillation/edge frequency 0.5%
+  t_edge_s:     {rel: 0.05}            # edge delays 5%
+  amp_v:        {rel: 0.03}            # amplitude 3%
+
+ac_sparam:
+  db:           {abs: 0.5}             # magnitude in dB
+  phase_deg:    {abs: 2.0}
+  f_3db_hz:     {rel: 0.02}
+
+drc:
+  # Calibre metal-subset vs magic: rule families compared by name+count;
+  # per-rule count delta allowed only where magic has known blind spots
+  count_delta_allowed_rules: []        # empty = exact match required
+lvs:
+  device_count_rel: {rel: 0.0}         # skeleton deck: exact counts per device type

@@ -1,0 +1,16 @@
+# Validation cases. tb paths are relative to the LinHT-rfic repo root.
+cases:
+  lodiv_chain_tt:
+    tb: macros/lodiv_top/testbenches/ngspice/lodiv_chain_tb.spice
+    corner: tt
+    params: {divsel: 0, fin: 4.4e9, vpp: 0.4}
+    signals: [lo_i, lo_q, clk_vco_div, i_vdd]
+  lodiv_chain_ss_edge:
+    tb: macros/lodiv_top/testbenches/ngspice/lodiv_chain_tb.spice
+    corner: ss
+    params: {divsel: 0, fin: 4.16e9, vpp: 0.4}
+    signals: [lo_i, lo_q, clk_vco_div]
+
+transient:
+  l2rel: 0.05        # waveform L2 difference vs ngspice reference
+  maxrel_span: 0.10  # worst point deviation over signal span

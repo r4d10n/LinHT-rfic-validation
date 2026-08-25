@@ -1,0 +1,25 @@
+// ===========================================================================
+// drc.template.runset — token template used by harness/pvrun.py
+// ===========================================================================
+// pvrun.py reads calibre/sg13g2_beol.drc, rewrites the LAYOUT PATH and
+// LAYOUT PRIMARY statements below (Calibre expands $VAR in INCLUDE/LAYOUT
+// PATH but NOT in LAYOUT PRIMARY — AGENTS.md §4 trap), and pushes the
+// instantiated deck to the VM as <rundir>/<deck>.drc.
+//
+// Tokens (substituted by pvrun.py, never by Calibre):
+//   @DECK@     absolute VM path of the instantiated rule deck
+//   @GDS@      GDS file name in the run directory (no $ expansion by us:
+//              plain relative name; calibre runs with cwd = run dir)
+//   @PRIMARY@  top cell name
+//   @RDB@      DRC results database file name
+//   @SUMMARY@  DRC summary report file name
+
+INCLUDE "@DECK@"
+
+LAYOUT SYSTEM     GDSII
+LAYOUT PATH       "@GDS@"
+LAYOUT PRIMARY    "@PRIMARY@"
+LAYOUT CASE       YES
+
+DRC RESULTS DATABASE "@RDB@" ASCII
+DRC SUMMARY REPORT   "@SUMMARY@"

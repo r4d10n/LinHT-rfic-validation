@@ -1,0 +1,220 @@
+// ===========================================================================
+// sg13g2_beol.drc — IHP SG13G2 BEOL physical verification, Siemens Calibre
+// ===========================================================================
+//
+// Transcribed from the open-source KLayout Ruby DRC decks shipped in the PDK:
+//   $PDK_ROOT/ihp-sg13g2/libs.tech/klayout/tech/drc/rule_decks/beol/
+//     5_16_metal1.drc  5_17_metaln.drc  5_19_via1.drc  5_20_vian.drc
+//     5_21_topvia1.drc 5_24_topvia2.drc 5_22_topmetal1.drc 5_25_topmetal2.drc
+// Numeric values cross-checked against rule_decks/sg13g2_tech_default.json
+// (key "drc_rules"). Every check carries its KLayout source rule id in the
+// leading comment so the mapping stays auditable (see docs/calibre_deck_notes.md).
+//
+// Subset policy (wave 1): minimum width/space for M1..TopMetal2 and
+// size/space/enclosure for Via1..Via4, TopVia1, TopVia2. Density-dependent and
+// conditional-spacing rules are deliberately OUT of scope for this wave;
+// see docs/calibre_deck_notes.md for the exact coverage table.
+//
+// Units: micrometers. GDS database unit assumed 0.0005 um (PDK default).
+//
+// Syntax notes (verified empirically against Calibre v2026.3_27.19):
+//   * rule checks are brace-named:  Name { OP layers < value }
+//   * minimum width uses INT (no WIDTH keyword in SVRF);
+//     spacing/notch uses EXT; enclosure ENC; AREA for oversize.
+//   * ENC A B < d : A is the ENCLOSED layer, B the enclosing layer
+//     (verified with a synthetic probe; see docs/calibre_deck_notes.md).
+//
+// NOTE FOR AUTOMATION: Calibre expands $VAR inside INCLUDE / LAYOUT PATH but
+// NOT inside LAYOUT PRIMARY. harness/pvrun.py rewrites LAYOUT PATH and
+// LAYOUT PRIMARY itself before pushing the deck to the VM (AGENTS.md §4).
+// The defaults below match the staged filename used by pvrun.py.
+
+LAYOUT SYSTEM     GDSII
+LAYOUT PATH       "chip_top_logo_fill.gds"
+LAYOUT PRIMARY    "chip_top_logo_fill"
+LAYOUT CASE       YES
+
+DRC RESULTS DATABASE "calibre_drc.db" ASCII
+DRC SUMMARY REPORT   "calibre_drc.summary"
+DRC MAXIMUM RESULTS  100000
+
+// ---------------------------------------------------------------------------
+// Layers (GDS layer/datatype from rule_decks/layers_def.drc)
+// ---------------------------------------------------------------------------
+LAYER M1         8 0      // metal1_drw
+LAYER M1F        8 22     // metal1_filler
+LAYER M2         10 0     // metal2_drw
+LAYER M2F        10 22    // metal2_filler
+LAYER M3         30 0     // metal3_drw
+LAYER M3F        30 22    // metal3_filler
+LAYER M4         50 0     // metal4_drw
+LAYER M4F        50 22    // metal4_filler
+LAYER M5         67 0     // metal5_drw
+LAYER M5F        67 22    // metal5_filler
+LAYER V1         19 0     // via1_drw
+LAYER V2         29 0     // via2_drw
+LAYER V3         49 0     // via3_drw
+LAYER V4         66 0     // via4_drw
+LAYER TV1        125 0    // topvia1_drw
+LAYER TV2        133 0    // topvia2_drw
+LAYER TM1        126 0    // topmetal1_drw
+LAYER TM1F       126 22   // topmetal1_filler
+LAYER TM2        134 0    // topmetal2_drw
+LAYER TM2F       134 22   // topmetal2_filler
+LAYER EDGESEAL   39 0     // edgeseal_drw (edge seal ring exclusion)
+
+// ---------------------------------------------------------------------------
+// Derivations (mirror the KLayout decks)
+// ---------------------------------------------------------------------------
+// drawing + filler joins used by the ".b" space rules
+M1DF = (M1 + M1F)
+M2DF = (M2 + M2F)
+M3DF = (M3 + M3F)
+M4DF = (M4 + M4F)
+M5DF = (M5 + M5F)
+TM1DF = (TM1 + TM1F)
+TM2DF = (TM2 + TM2F)
+
+// vias outside the edge-seal ring: via_lay.not(edgeseal_drw) in KLayout
+V1NS = (V1 NOT EDGESEAL)
+V2NS = (V2 NOT EDGESEAL)
+V3NS = (V3 NOT EDGESEAL)
+V4NS = (V4 NOT EDGESEAL)
+TV1NS = (TV1 NOT EDGESEAL)
+TV2NS = (TV2 NOT EDGESEAL)
+
+// ===========================================================================
+// Fixed-size via checks — transcription note
+// ---------------------------------------------------------------------------
+// KLayout uses without_bbox_min(v)/without_bbox_max(v): the via bounding box
+// must equal v in BOTH dimensions. SVRF has no bbox-equality check, so each
+// "_a" rule is split into:
+//   _a_w : INT  < v     catches any dimension below v (INT = internal width)
+//   _a_A : AREA > v*v   catches any shape exceeding the nominal square
+// A non-square rectangle can only pass both tests when both dimensions equal v.
+// ===========================================================================
+
+// ===========================================================================
+// 5.16  Metal1  (beol/5_16_metal1.drc)
+// ===========================================================================
+
+// Rule M1.a: Min. Metal1 width = 0.16 um            [KLayout id: M1.a]
+M1_a { INT M1 < 0.16 }
+
+// Rule M1.b: Min. Metal1 (drawing + filler) space or notch = 0.18 um
+//                                                   [KLayout id: M1.b]
+M1_b { EXT M1DF < 0.18 }
+
+// ===========================================================================
+// 5.17  Metal2 .. Metal5  (beol/5_17_metaln.drc)
+// ===========================================================================
+
+// Rule Mn.a: Min. Metalm width = 0.20 um            [KLayout id: M2.a]
+M2_a { INT M2 < 0.20 }
+// Rule Mn.b: Min. Metalm (drawing + filler) space or notch = 0.21 um
+//                                                   [KLayout id: M2.b]
+M2_b { EXT M2DF < 0.21 }
+
+//                                                   [KLayout id: M3.a]
+M3_a { INT M3 < 0.20 }
+//                                                   [KLayout id: M3.b]
+M3_b { EXT M3DF < 0.21 }
+
+//                                                   [KLayout id: M4.a]
+M4_a { INT M4 < 0.20 }
+//                                                   [KLayout id: M4.b]
+M4_b { EXT M4DF < 0.21 }
+
+//                                                   [KLayout id: M5.a]
+M5_a { INT M5 < 0.20 }
+//                                                   [KLayout id: M5.b]
+M5_b { EXT M5DF < 0.21 }
+
+// ===========================================================================
+// 5.19  Via1  (beol/5_19_via1.drc)
+// ===========================================================================
+// Rule V1.a: Min. and max. Via1 width = 0.19 um     [KLayout id: V1.a]
+// (KLayout additionally excludes vias on npn13g2l markers; that device layer
+//  does not exist in SG13G2 GDS output of this flow — omission documented.)
+V1_a_w { INT V1NS < 0.19 }
+V1_a_A { AREA V1NS > 0.0361 }
+
+// Rule V1.b: Min. Via1 space = 0.22 um              [KLayout id: V1.b]
+V1_b { EXT V1NS < 0.22 }
+
+// Rule V1.c: Min. Metal1 enclosure of Via1 = 0.01 um [KLayout id: V1.c]
+// KLayout: via1.enclosed(metal1). SVRF ENC order verified on VM:
+// first operand = enclosed (via), second = enclosing (metal).
+V1_c { ENC V1NS M1 < 0.01 }
+
+// ===========================================================================
+// 5.20  Via2 .. Via4  (beol/5_20_vian.drc)
+// ===========================================================================
+// Rule Vn.a: Min./max. Viam width = 0.19 um         [KLayout id: V2.a]
+V2_a_w { INT V2NS < 0.19 }
+V2_a_A { AREA V2NS > 0.0361 }
+// Rule Vn.b: Min. Viam space = 0.22 um              [KLayout id: V2.b]
+V2_b { EXT V2NS < 0.22 }
+// Rule Vn.c: Min. Metal enclosure of Via = 0.005 um [KLayout id: V2.c]
+V2_c { ENC V2NS M2 < 0.005 }
+
+//                                                   [KLayout id: V3.a]
+V3_a_w { INT V3NS < 0.19 }
+V3_a_A { AREA V3NS > 0.0361 }
+//                                                   [KLayout id: V3.b]
+V3_b { EXT V3NS < 0.22 }
+//                                                   [KLayout id: V3.c]
+V3_c { ENC V3NS M3 < 0.005 }
+
+//                                                   [KLayout id: V4.a]
+V4_a_w { INT V4NS < 0.19 }
+V4_a_A { AREA V4NS > 0.0361 }
+//                                                   [KLayout id: V4.b]
+V4_b { EXT V4NS < 0.22 }
+// Rule Vn.c: Min. Metal4 enclosure of Via4 = 0.005 um [KLayout id: V4.c]
+// (vian table zips [via2,via3,via4] with [metal2,metal3,metal4])
+V4_c { ENC V4NS M4 < 0.005 }
+
+// ===========================================================================
+// 5.21  TopVia1  (beol/5_21_topvia1.drc)
+// ===========================================================================
+// Rule TV1.a: Min. and max. TopVia1 width = 0.42 um [KLayout id: TV1.a]
+TV1_a_w { INT TV1NS < 0.42 }
+TV1_a_A { AREA TV1NS > 0.1764 }
+// Rule TV1.b: Min. TopVia1 space = 0.42 um          [KLayout id: TV1.b]
+TV1_b { EXT TV1NS < 0.42 }
+// Rule TV1.c: Min. Metal5 enclosure of TopVia1 = 0.10 um [KLayout id: TV1.c]
+TV1_c { ENC TV1NS M5 < 0.10 }
+// Rule TV1.d: Min. TopMetal1 enclosure of TopVia1 = 0.42 um [KLayout id: TV1.d]
+TV1_d { ENC TV1NS TM1 < 0.42 }
+
+// ===========================================================================
+// 5.24  TopVia2  (beol/5_24_topvia2.drc)
+// ===========================================================================
+// Rule TV2.a: Min. and max. TopVia2 width = 0.90 um [KLayout id: TV2.a]
+TV2_a_w { INT TV2NS < 0.90 }
+TV2_a_A { AREA TV2NS > 0.81 }
+// Rule TV2.b: Min. TopVia2 space = 1.06 um          [KLayout id: TV2.b]
+TV2_b { EXT TV2NS < 1.06 }
+// Rule TV2.c: Min. TopMetal1 enclosure of TopVia2 = 0.50 um [KLayout id: TV2.c]
+TV2_c { ENC TV2NS TM1 < 0.50 }
+// Rule TV2.d: Min. TopMetal2 enclosure of TopVia2 = 0.50 um [KLayout id: TV2.d]
+TV2_d { ENC TV2NS TM2 < 0.50 }
+
+// ===========================================================================
+// 5.22  TopMetal1  (beol/5_22_topmetal1.drc)
+// ===========================================================================
+// Rule TM1.a: Min. TopMetal1 width = 1.64 um        [KLayout id: TM1.a]
+TM1_a { INT TM1 < 1.64 }
+// Rule TM1.b: Min. TopMetal1 (drawing + filler) space or notch = 1.64 um
+//                                                   [KLayout id: TM1.b]
+TM1_b { EXT TM1DF < 1.64 }
+
+// ===========================================================================
+// 5.25  TopMetal2  (beol/5_25_topmetal2.drc)
+// ===========================================================================
+// Rule TM2.a: Min. TopMetal2 width = 2.00 um        [KLayout id: TM2.a]
+TM2_a { INT TM2 < 2.00 }
+// Rule TM2.b: Min. TopMetal2 (drawing + filler) space or notch = 2.00 um
+//                                                   [KLayout id: TM2.b]
+TM2_b { EXT TM2DF < 2.00 }
