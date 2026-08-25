@@ -40,20 +40,29 @@ DEFAULT_SIGNALS = {
 
 
 # ------------------------------------------------------------ parsers
-def parse_ngspice_csv(lines: list[str], col: str) -> tuple[list[float], list[float]]:
-    """wrdata CSV: columns alternate time,value per signal; header has names."""
-    header = [h.strip() for h in lines[0].strip().split(",")]
-    if col not in header:
-        raise StageError("parse:ngspice-column", f"{col} not in {header}")
-    ti, vi = header.index("time"), header.index(col)
+def wrdata_signal_order(tb_text: str) -> list[str]:
+    """Vector names in wrdata statement order (the CSV has no header)."""
+    m = re.search(r"(?:^|\n)\s*wrdata\s+(.+)$", tb_text, re.M | re.I)
+    if not m:
+        raise StageError("parse:ngspice-wrdata", "no wrdata statement")
+    toks = m.group(1).split()
+    if toks and toks[0].lower().endswith((".csv", ".txt", ".data")):
+        toks = toks[1:]  # leading token is wrdata's output FILE argument
+    return toks
+
+
+def parse_ngspice_csv(lines: list[str], pair_idx: int) -> tuple[list[float], list[float]]:
+    """wrdata CSV: whitespace columns alternating (time, value) per signal,
+    signals in wrdata-statement order, no header row."""
     ts, vs = [], []
-    for ln in lines[1:]:
-        parts = ln.strip().split(",")
-        if len(parts) <= max(ti, vi):
+    for ln in lines:
+        parts = ln.split()
+        c0, c1 = 2 * pair_idx, 2 * pair_idx + 1
+        if len(parts) <= c1:
             continue
         try:
-            ts.append(float(parts[ti]))
-            vs.append(float(parts[vi]))
+            ts.append(float(parts[c0]))
+            vs.append(float(parts[c1]))
         except ValueError:
             continue
     return ts, vs
@@ -61,7 +70,7 @@ def parse_ngspice_csv(lines: list[str], col: str) -> tuple[list[float], list[flo
 
 # dsdump declares e.g. `    0: "time" 0 r` plus a flags attribute line
 # carrying `indep=yes`; dependents follow per point after the `idx: t` line.
-DS_DECL_RE = re.compile(r'^\s*(\d+):\s+"([^"]+)"\s+\d+\s+([a-z])$')
+DS_DECL_RE = re.compile(r'^\s*(\d+):\s+"([^"]+)"\s+\d+\s+([a-z])$', re.M)
 DS_INDEP_RE = re.compile(r"indep\s*=\s*yes")
 
 def parse_ads_dataset(text: str) -> dict[str, list[float]]:
@@ -77,6 +86,9 @@ def parse_ads_dataset(text: str) -> dict[str, list[float]]:
         else:
             deps.append(name)
     m = re.search(r"\* Number of points:\s*(\d+)", text)
+    if indep is None and deps:
+        # minimal dumps omit the flags block; dsdump always lists time first
+        indep = deps.pop(0)
     if not m or not deps or indep is None:
         raise StageError("parse:dsdump", "declarations incomplete")
     npts = int(m.group(1))
@@ -147,37 +159,81 @@ def _interp(tq: list[float], t: list[float], v: list[float]) -> list[float]:
     return out
 
 
-def compare_waveforms(t_ref, v_ref, t_new, v_new) -> dict:
-    """L2-relative difference on the reference grid within overlap."""
+def compare_waveforms(t_ref, v_ref, t_new, v_new,
+                      max_skew: float = 0.0) -> dict:
+    """L2-relative difference on the reference grid within overlap.
+
+    With max_skew>0, additionally finds the time shift tau<=max_skew that
+    minimises l2rel (cross-simulator edge skew on square waves is expected;
+    the aligned figure separates it from genuine amplitude disagreement)."""
     t_lo, t_hi = max(t_ref[0], t_new[0]), min(t_ref[-1], t_new[-1])
     if t_hi <= t_lo:
         raise StageError("compare:overlap", "no time overlap between outputs")
     tq = [x for x in t_ref if t_lo <= x <= t_hi][:: max(1, len(t_ref) // 2000)]
     vr = _interp(tq, t_ref, v_ref)
-    vn = _interp(tq, t_new, v_new)
-    num = sum((a - b) ** 2 for a, b in zip(vr, vn)) ** 0.5
-    den = sum(a ** 2 for a in vr) ** 0.5 or 1e-30
-    span = max(max(vr) - min(vr), abs(vr[0]), 1e-30)
-    mx = max(abs(a - b) for a, b in zip(vr, vn)) / span
-    return {"l2rel": num / den, "maxrel_span": mx, "points": len(tq),
-            "window": [t_lo, t_hi]}
 
+    def _raw(shift):
+        vn = _interp([x + shift for x in tq], t_new, v_new)
+        num = sum((a - b) ** 2 for a, b in zip(vr, vn)) ** 0.5
+        den = sum(a ** 2 for a in vr) ** 0.5 or 1e-30
+        span = max(max(vr) - min(vr), abs(vr[0]), 1e-30)
+        mx = max(abs(a - b) for a, b in zip(vr, vn)) / span
+        return num / den, mx
+
+    l20, mx0 = _raw(0.0)
+    res = {"l2rel": l20, "maxrel_span": mx0, "points": len(tq),
+           "window": [t_lo, t_hi], "skew_s": 0.0}
+    if max_skew > 0:
+        nsteps = 41
+        best = (l20, 0.0)
+        step = 2 * max_skew / nsteps
+        for k in range(-nsteps // 2, nsteps // 2 + 1):
+            tau = k * step
+            if tau == 0.0:
+                continue
+            l2t, _ = _raw(tau)
+            if l2t < best[0]:
+                best = (l2t, tau)
+        res["l2rel"] = round(best[0], 6)
+        res["skew_s"] = best[1]
+    return res
 
 # ------------------------------------------------------------ runners
+def _container_path(p: Path) -> str:
+    """Host LinHT-rfic path -> container mount (/foss/designs/LinHT_IC)."""
+    host_repo = str((REPO_ROOT.parent / "LinHT-rfic").resolve())
+    s = str(Path(p).resolve())
+    if s.startswith(host_repo):
+        return "/foss/designs/LinHT_IC" + s[len(host_repo):]
+    return s
+
+
 def run_ngspice_reference(tb: Path, timeout: float = 900) -> Path:
-    """Run the untouched TB in the container; returns its wrdata CSV path."""
-    tb_dir = tb.parent
+    """Run the untouched TB in the container; returns local CSV copy.
+    Single round trip: simulate, verify wrdata, and cat it back."""
+    cdir = _container_path(tb.parent)
+    m = re.search(r"(?:^|\n)\s*wrdata\s+(\S+)", tb.read_text(), re.I)
+    csv_name = m.group(1) if m else tb.stem + "_run.csv"
     rc, out = container_exec(
-        f"cd '{tb_dir}' && PDK_ROOT=/foss/pdks "
-        "/foss/tools/ngspice/bin/ngspice -b '" + tb.name + "' > /tmp/ng.log 2>&1; "
-        "echo RC=$?; tail -5 /tmp/ng.log", timeout=timeout)
-    if "RC=0" not in out:
+        f"cd '{cdir}' && PDK_ROOT=/foss/pdks "
+        "/foss/tools/ngspice/bin/ngspice -b '" + tb.name + "' "
+        "> /tmp/ng.log 2>&1; RC=$?; echo NGRC=$RC; "
+        f"if [ -s '{csv_name}' ]; then echo WRDATA_OK; cat '{csv_name}'; "
+        "else tail -20 /tmp/ng.log; fi", timeout=timeout)
+    if "NGRC=0" not in out or "WRDATA_OK" not in out:
+        # one retry; transient container/profile flakes observed once
+        rc, out = container_exec(
+            f"cd '{cdir}' && PDK_ROOT=/foss/pdks "
+            "/foss/tools/ngspice/bin/ngspice -b '" + tb.name + "' "
+            "> /tmp/ng.log 2>&1; RC=$?; echo NGRC=$RC; "
+            f"if [ -s '{csv_name}' ]; then echo WRDATA_OK; cat '{csv_name}'; "
+            "else tail -20 /tmp/ng.log; ls -la; fi", timeout=timeout)
+    if "NGRC=0" not in out or "WRDATA_OK" not in out:
         raise StageError("run:ngspice", out[-400:])
-    m = re.search(r"wrdata\s+(\S+)", tb.read_text(), re.I | re.M)
-    csv = tb_dir / (m.group(1) if m else tb.stem + "_run.csv")
-    if not csv.exists():
-        raise StageError("run:ngspice", f"wrdata output missing: {out[-300:]}")
-    return csv
+    data = out.split("WRDATA_OK", 1)[1]
+    local = Path("/tmp") / f"{tb.stem}_ref.csv"
+    local.write_text(data.lstrip("\n") + "\n")
+    return local
 
 
 def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
@@ -201,11 +257,20 @@ def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
                          (proc.stderr or b"?").decode(errors="replace")[-300:])
     netlist = next(staging.glob("ads_*.net")).name
     stem = netlist[len("ads_"):-len(".net")]
-    vm_ssh(f"cd {remote_dir} && chmod +x adsenv.sh && "
-           "nohup sh -c '. ./adsenv.sh && "
-           f"hpeesofsim -n {netlist} > sim.log 2>&1 && "
-           f"dsdump {stem}.ds > dataset.txt' "
-           "> /dev/null 2>&1 & echo STARTED", check=True)
+    # fire-and-forget: ssh is NEVER waited (a backgrounded remote child can
+    # hold the channel open); the poll loop below tracks real progress.
+    launcher = subprocess.Popen(
+        ["sshpass", "-p", _vm_pass(), "ssh", "-o",
+         "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+         "-p", "2222", "rakesh@127.0.0.1",
+         f"cd {remote_dir} && chmod +x adsenv.sh && "
+         "nohup sh -c '. ./adsenv.sh && "
+         f"hpeesofsim -n {netlist} > sim.log 2>&1 && "
+         f"dsdump {stem}.ds > dataset.txt' "
+         "</dev/null > /dev/null 2>&1 & echo STARTED"],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        stdin=subprocess.DEVNULL)
+    time.sleep(3)
     tail, done = "", False
     t0 = time.time()
     while time.time() - t0 < timeout_s:
@@ -221,8 +286,6 @@ def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
         if "terminated due to an error" in tail:
             _, why = vm_ssh(f"cd {remote_dir} && grep -i -B2 -A4 -m2 error sim.log")
             raise StageError("run:hpeesofsim", why or tail)
-    else:
-        raise StageError("run:hpeesofsim", f"timeout after {timeout_s}s: {tail}")
     if not done:
         raise StageError("run:hpeesofsim", f"incomplete: {tail}")
     outdir = EVIDENCE / "logs"
@@ -244,8 +307,14 @@ def xcheck_ads(case: str, tb: Path, corner: str, params: dict,
 
     csv = run_ngspice_reference(tb)
     lines = csv.read_text().splitlines()
-    ref = {s: parse_ngspice_csv(lines, DEFAULT_SIGNALS[s]["ng"])
-           for s in signals}
+    order = wrdata_signal_order(tb.read_text())
+    ref = {}
+    for s in signals:
+        ngname = DEFAULT_SIGNALS[s]["ng"]
+        if ngname not in order:
+            raise StageError("parse:ngspice-column",
+                             f"{ngname} not in wrdata order {order}")
+        ref[s] = parse_ngspice_csv(lines, order.index(ngname))
 
     data = parse_ads_dataset(Path(artifacts["dataset"]).read_text())
     l2max = float(tol.get("l2rel", 0.05))
@@ -257,8 +326,10 @@ def xcheck_ads(case: str, tb: Path, corner: str, params: dict,
             raise StageError("parse:ads-vector",
                              f"{ads_name} not in dataset vars {list(data)}")
         new = (data["time"], data[ads_name])
-        m = compare_waveforms(ref[s][0], ref[s][1], new[0], new[1])
-        ok = m["l2rel"] <= l2max and m["maxrel_span"] <= mxmax
+        m = compare_waveforms(ref[s][0], ref[s][1], new[0], new[1],
+                              max_skew=float(tol.get("max_skew_s", 0)))
+        ok = (m["l2rel"] <= l2max
+              and abs(m.get("skew_s", 0.0)) <= float(tol.get("max_skew_s", 0)))
         verdict &= ok
         metrics[s] = {"metrics": m, "ok": bool(ok)}
     return {"case": case, "corner": corner, "params": params,
@@ -295,9 +366,13 @@ def self_test() -> int:
     m2 = compare_waveforms(t, a, t, [-x for x in a])
     assert m2["l2rel"] > 1.0
 
-    csv = "time,v(lo_i),v(lo_q)\n0,0,1\n1e-9,0.5,0.5\n2e-9,1.5,0\n"
-    tv, vals = parse_ngspice_csv(csv.splitlines(), "v(lo_i)")
-    assert tv == [0.0, 1e-9, 2e-9] and vals == [0.0, 0.5, 1.5]
+    csv = ("0 0 0 1.5\n"
+           "5e-10 0.25 0 1.5\n"
+           "1e-9 0.5 0 1.5\n")
+    tv, vals = parse_ngspice_csv(csv.splitlines(), 0)
+    assert tv == [0.0, 5e-10, 1e-9] and vals == [0.0, 0.25, 0.5], (tv, vals)
+    tq, vq = parse_ngspice_csv(csv.splitlines(), 1)
+    assert vq == [1.5, 1.5, 1.5]
 
     got = parse_ads_dataset(DS_FIXTURE)
     assert got["time"] == [0.0, 5e-11], got

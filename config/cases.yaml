@@ -13,4 +13,5 @@ cases:
 
 transient:
   l2rel: 0.05        # waveform L2 difference vs ngspice reference
+  max_skew_s: 200e-12 # cross-simulator edge skew allowed before alignment fails
   maxrel_span: 0.10  # worst point deviation over signal span

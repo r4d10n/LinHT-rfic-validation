@@ -175,11 +175,29 @@ def _split6(argstr: str) -> list[str]:
     return a[:6]
 
 
+def _join_cont_lines(text: str) -> str:
+    """Merge SPICE `+` continuation lines into their previous line."""
+    out: list[str] = []
+    for raw in text.splitlines():
+        s = raw.rstrip()
+        if s.lstrip().startswith("+") and out:
+            out[-1] += " " + s.lstrip()[1:].strip()
+        else:
+            out.append(s)
+    return "\n".join(out)
+
+
+def _ads_safe(line: str) -> str:
+    """ADS runs a C preprocessor over netlists BEFORE parsing; a `/*`
+    anywhere (even inside `;` comment prose) opens an unterminated comment
+    that silently swallows the rest of the file."""
+    return debrace(line).replace("/*", "/\\*")
 def translate_staged(text: str, target: str) -> str:
     """Rewrite a staged repo netlist for the target dialect.
 
     Repo macro nets are uniform: .subckt NAME pins k=v / .ends NAME, all
     devices as X-calls to wrapper subckts, {braced} instance params."""
+    text = _join_cont_lines(text)
     out = []
     for ln in text.splitlines():
         s = ln.strip()
@@ -202,6 +220,7 @@ def translate_staged(text: str, target: str) -> str:
         if low.startswith(".ends"):
             name = s.split()[1] if len(s.split()) > 1 else ""
             out.append(f"end {name}".strip() if target == "ads" else f"ends {name}".strip())
+            continue
         if target == "ads":
             if s.startswith("*"):
                 out.append("; " + s[1:])
@@ -266,6 +285,8 @@ def translate_staged(text: str, target: str) -> str:
             out.append(debrace(ln))
             continue
         out.append(debrace(ln))
+    if target == "ads":
+        return "\n".join(_ads_safe(l) for l in out) + "\n"
     return "\n".join(out) + "\n"
 
 
@@ -294,7 +315,7 @@ def gen_ads(doc: dict, corner: str, extra_defs: list[str]) -> list[str]:
         elif a["type"] == "op":
             # OP via a degenerate tran: identical metric extraction across sims
             o.append("Tran:tran1 StopTime=1n MaxTimeStep=1n")
-    return o
+    return [_ads_safe(l) for l in o]
 
 
 _SPECTRE_WRAPPERS = """
@@ -435,7 +456,15 @@ def adapt(tb: Path, target: str, corner: str, staging: Path,
         raise StageError("adapt:target", f"unknown target {target}")
     doc = parse_tb(tb)
     if param_overrides:
-        doc["params"] = [f"{k}={v}" for k, v in param_overrides.items()] + doc["params"]
+        # merge: overrides REPLACE same-name keys from the deck's .param lines
+        merged: dict[str, str] = {}
+        for p in doc["params"]:
+            for kv in p.split():
+                if "=" in kv:
+                    k, _, v = kv.partition("=")
+                    merged[k] = v
+        merged.update(param_overrides)
+        doc["params"] = [f"{k}={v}" for k, v in merged.items()]
     incs = resolve_includes(tb, doc["includes"])
     staged = stage_circuit_files(incs, staging)
 

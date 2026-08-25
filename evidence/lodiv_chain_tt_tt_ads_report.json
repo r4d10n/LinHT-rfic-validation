@@ -1,0 +1,62 @@
+{
+  "case": "lodiv_chain_tt",
+  "corner": "tt",
+  "reference": {
+    "tool": "ngspice",
+    "deck": "/home/rfsoc/exp/rfic/LinHT-rfic/macros/lodiv_top/testbenches/ngspice/lodiv_chain_tb.spice"
+  },
+  "crosscheck": {
+    "tool": "hpeesofsim"
+  },
+  "signals": {
+    "lo_i": {
+      "metrics": {
+        "l2rel": 0.2045749579261561,
+        "maxrel_span": 0.5894046872967397,
+        "points": 2065,
+        "window": [
+          0.0,
+          3.3e-08
+        ]
+      },
+      "ok": false
+    },
+    "lo_q": {
+      "metrics": {
+        "l2rel": 0.12715169919730157,
+        "maxrel_span": 0.4420437997056774,
+        "points": 2065,
+        "window": [
+          0.0,
+          3.3e-08
+        ]
+      },
+      "ok": false
+    },
+    "clk_vco_div": {
+      "metrics": {
+        "l2rel": 0.031110741216728303,
+        "maxrel_span": 0.25721544572574695,
+        "points": 2065,
+        "window": [
+          0.0,
+          3.3e-08
+        ]
+      },
+      "ok": false
+    },
+    "i_vdd": {
+      "metrics": {
+        "l2rel": 0.17820383218937108,
+        "maxrel_span": 0.2925249569881177,
+        "points": 2065,
+        "window": [
+          0.0,
+          3.3e-08
+        ]
+      },
+      "ok": false
+    }
+  },
+  "verdict": "FAIL"
+}
