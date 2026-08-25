@@ -66,22 +66,24 @@ LAYER EDGESEAL   39 0     // edgeseal_drw (edge seal ring exclusion)
 // ---------------------------------------------------------------------------
 // Derivations (mirror the KLayout decks)
 // ---------------------------------------------------------------------------
+// Syntax: bare "A OR B" / "A NOT B" — this Calibre build rejects
+// parenthesized layer booleans (LAY7 implicit-layer error, verified).
 // drawing + filler joins used by the ".b" space rules
-M1DF = (M1 + M1F)
-M2DF = (M2 + M2F)
-M3DF = (M3 + M3F)
-M4DF = (M4 + M4F)
-M5DF = (M5 + M5F)
-TM1DF = (TM1 + TM1F)
-TM2DF = (TM2 + TM2F)
+M1DF = M1 OR M1F
+M2DF = M2 OR M2F
+M3DF = M3 OR M3F
+M4DF = M4 OR M4F
+M5DF = M5 OR M5F
+TM1DF = TM1 OR TM1F
+TM2DF = TM2 OR TM2F
 
 // vias outside the edge-seal ring: via_lay.not(edgeseal_drw) in KLayout
-V1NS = (V1 NOT EDGESEAL)
-V2NS = (V2 NOT EDGESEAL)
-V3NS = (V3 NOT EDGESEAL)
-V4NS = (V4 NOT EDGESEAL)
-TV1NS = (TV1 NOT EDGESEAL)
-TV2NS = (TV2 NOT EDGESEAL)
+V1NS = V1 NOT EDGESEAL
+V2NS = V2 NOT EDGESEAL
+V3NS = V3 NOT EDGESEAL
+V4NS = V4 NOT EDGESEAL
+TV1NS = TV1 NOT EDGESEAL
+TV2NS = TV2 NOT EDGESEAL
 
 // ===========================================================================
 // Fixed-size via checks — transcription note

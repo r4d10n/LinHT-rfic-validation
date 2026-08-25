@@ -1,0 +1,2173 @@
+WARNING: Software tree location not set or invalid, using $CALIBRE_HOME=/opt/siemens/calibre
+//  Calibre v2026.3_27.19    Thu Aug 6 14:59:14 PDT 2026
+//  Calibre Utility Library   v0-10_13-2017-1    Tue Mar 17 08:04:54 PDT 2026
+//  Litho Libraries v2026.3_27.19  Thu Aug 6 14:59:14 PDT 2026
+//
+//                   Copyright Siemens 1996-2026
+//                       All Rights Reserved.
+//   THIS WORK CONTAINS TRADE SECRET AND PROPRIETARY INFORMATION
+//          WHICH IS THE PROPERTY OF SIEMENS CORPORATION
+//        OR ITS LICENSORS AND IS SUBJECT TO LICENSE TERMS.
+//
+//  The registered trademark Linux is used pursuant to a sublicense from LMI, the
+//  exclusive licensee of Linus Torvalds, owner of the mark on a world-wide basis.
+//
+//  Siemens software executing under x86-64 Linux
+//
+WARNING: tuned profile "balanced" on host "samjna.asnaviram" may not be ideal for best performance. Refer to Calibre Admin Guide.
+//  Running on Linux samjna.asnaviram (127.0.0.1) 5.14.0-570.39.1.el9_6.x86_64 #1 SMP PREEMPT_DYNAMIC Sat Aug 23 04:30:05 EDT 2025 x86_64 glibc 2.34/NPTL 2.34
+//  OS: Red Hat Enterprise Linux release 9.6 (Plow)[5.14.0-570.39.1.el9_6.x86_64]
+//  hypervisor detected
+//
+//  Entries in /proc/meminfo:
+//
+//  MemTotal:       16103328 kB
+//  MemFree:          443584 kB
+//  MemAvailable:   13064908 kB
+//  Buffers:          105164 kB
+//  Cached:         12279584 kB
+//  SwapCached:        12172 kB
+//  Active:          1843908 kB
+//  Inactive:       12408520 kB
+//  Active(anon):     935536 kB
+//  Inactive(anon):   949088 kB
+//  Active(file):     908372 kB
+//  Inactive(file): 11459432 kB
+//  Unevictable:       12336 kB
+//  Mlocked:               0 kB
+//  SwapTotal:       8237052 kB
+//  SwapFree:        7244284 kB
+//  Zswap:                 0 kB
+//  Zswapped:              0 kB
+//  Dirty:               680 kB
+//  Writeback:             0 kB
+//  AnonPages:       1863892 kB
+//  Mapped:           670628 kB
+//  Shmem:             16944 kB
+//  KReclaimable:     594356 kB
+//  Slab:             797252 kB
+//  SReclaimable:     594356 kB
+//  SUnreclaim:       202896 kB
+//  KernelStack:       10688 kB
+//  PageTables:        41140 kB
+//  SecPageTables:         0 kB
+//  NFS_Unstable:          0 kB
+//  Bounce:                0 kB
+//  WritebackTmp:          0 kB
+//  CommitLimit:    16288716 kB
+//  Committed_AS:    6478972 kB
+//  VmallocTotal:   34359738367 kB
+//  VmallocUsed:       27860 kB
+//  VmallocChunk:          0 kB
+//  Percpu:             4288 kB
+//  HardwareCorrupted:     0 kB
+//  AnonHugePages:   1177600 kB
+//  ShmemHugePages:        0 kB
+//  ShmemPmdMapped:        0 kB
+//  FileHugePages:         0 kB
+//  FilePmdMapped:         0 kB
+//  CmaTotal:              0 kB
+//  CmaFree:               0 kB
+//  Unaccepted:            0 kB
+//  HugePages_Total:       0
+//  HugePages_Free:        0
+//  HugePages_Rsvd:        0
+//  HugePages_Surp:        0
+//  Hugepagesize:       2048 kB
+//  Hugetlb:               0 kB
+//  DirectMap4k:      264128 kB
+//  DirectMap2M:    13361152 kB
+//  DirectMap1G:     5242880 kB
+//
+//  User limits:
+//
+//  Data size: unlimited
+//  RSS: unlimited
+//  Stack size: 8192 kB
+//  Max user processes: 62651
+//  VM: unlimited
+//  Current active profile: balanced
+//  net.netfilter.nf_conntrack_max: 262144
+//  net.netfilter.nf_conntrack_buckets: 262144
+//  net.core.rmem_max: 212992
+//  net.core.wmem_max: 212992
+//  vm.max_map_count: 65530
+//  vm.overcommit_memory: 0
+//  kernel.numa_balancing: 0
+//  kernel.pid_max: 4194304
+//
+WARNING: Please increase descriptors limit for best performance (1024)
+//
+//  Processor AMD Ryzen 7 7700 8-Core Processor               [25972] (4th generation)
+//  CPU Info: Cores = 8, affinity = (8/8/8)
+//  Max file descriptors: 1024
+//  64 bit virtual addressing enabled
+//  Running calibre/pkgs/icv/pvt/calibre -drc -hier sg13g2_beol_gen.drc
+//  Process ID: 1035983
+//
+//  Starting time: Wed Aug 26 02:34:04 2026
+//
+
+--- CALIBRE_* ENVIRONMENT VARIABLES:
+
+CALIBRE_ATOMIC_LVHEAP=0
+CALIBRE_CMD_LINE='/opt/siemens/calibre/pkgs/icv/pvt/calibre  -drc -hier sg13g2_beol_gen.drc'
+CALIBRE_HOME=/opt/siemens/calibre
+CALIBRE_INITIAL_CMD_LINE='/opt/siemens/calibre/bin/calibre -drc -hier sg13g2_beol_gen.drc'
+CALIBRE_MTFLEX_LOGTAG=samjna.asnaviram.1035983.2026_0826_0234
+CALIBRE_READDB_LD_LIBRARY_PATH=/opt/siemens/calibre/shared/pkgs/icv/tools/calibre_client/lib/64:/opt/siemens/calibre/pkgs/calibre_base/lib64:/opt/siemens/calibre/pkgs/icv_lib/lib64:/opt/siemens/calibre/pkgs/icv_qt5_comp/plugins:/opt/siemens/calibre/pkgs/icv_oa/22.41p004/lib/linux_rhel68_gcc44x_64/opt
+CALIBRE_SKIP_OS_CHECKS=
+//  Running on 1 CPU (pending licensing) 
+//
+//
+
+--- CALIBRE::DRC-H - Wed Aug 26 02:34:05 2026
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-----          STANDARD VERIFICATION RULE FILE COMPILATION MODULE          -----
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+--- RULE FILE = sg13g2_beol_gen.drc
+
+// ===========================================================================
+// sg13g2_beol.drc — IHP SG13G2 BEOL physical verification, Siemens Calibre
+// ===========================================================================
+//
+// Transcribed from the open-source KLayout Ruby DRC decks shipped in the PDK:
+//   $PDK_ROOT/ihp-sg13g2/libs.tech/klayout/tech/drc/rule_decks/beol/
+//     5_16_metal1.drc  5_17_metaln.drc  5_19_via1.drc  5_20_vian.drc
+//     5_21_topvia1.drc 5_24_topvia2.drc 5_22_topmetal1.drc 5_25_topmetal2.drc
+// Numeric values cross-checked against rule_decks/sg13g2_tech_default.json
+// (key "drc_rules"). Every check carries its KLayout source rule id in the
+// leading comment so the mapping stays auditable (see docs/calibre_deck_notes.md).
+//
+// Subset policy (wave 1): minimum width/space for M1..TopMetal2 and
+// size/space/enclosure for Via1..Via4, TopVia1, TopVia2. Density-dependent and
+// conditional-spacing rules are deliberately OUT of scope for this wave;
+// see docs/calibre_deck_notes.md for the exact coverage table.
+//
+// Units: micrometers. GDS database unit assumed 0.0005 um (PDK default).
+//
+// Syntax notes (verified empirically against Calibre v2026.3_27.19):
+//   * rule checks are brace-named:  Name { OP layers < value }
+//   * minimum width uses INT (no WIDTH keyword in SVRF);
+//     spacing/notch uses EXT; enclosure ENC; AREA for oversize.
+//   * ENC A B < d : A is the ENCLOSED layer, B the enclosing layer
+//     (verified with a synthetic probe; see docs/calibre_deck_notes.md).
+//
+// NOTE FOR AUTOMATION: Calibre expands $VAR inside INCLUDE / LAYOUT PATH but
+// NOT inside LAYOUT PRIMARY. harness/pvrun.py rewrites LAYOUT PATH and
+// LAYOUT PRIMARY itself before pushing the deck to the VM (AGENTS.md §4).
+// The defaults below match the staged filename used by pvrun.py.
+
+LAYOUT SYSTEM     GDSII
+LAYOUT PATH       "chip_top_logo_fill.gds"
+LAYOUT PRIMARY    "chip_top_logo_fill"
+LAYOUT CASE       YES
+
+DRC RESULTS DATABASE "calibre_drc.db" ASCII
+DRC SUMMARY REPORT   "calibre_drc.summary"
+DRC MAXIMUM RESULTS  100000
+
+// ---------------------------------------------------------------------------
+// Layers (GDS layer/datatype from rule_decks/layers_def.drc)
+// ---------------------------------------------------------------------------
+LAYER M1         8 0      // metal1_drw
+LAYER M1F        8 22     // metal1_filler
+LAYER M2         10 0     // metal2_drw
+LAYER M2F        10 22    // metal2_filler
+LAYER M3         30 0     // metal3_drw
+LAYER M3F        30 22    // metal3_filler
+LAYER M4         50 0     // metal4_drw
+LAYER M4F        50 22    // metal4_filler
+LAYER M5         67 0     // metal5_drw
+LAYER M5F        67 22    // metal5_filler
+LAYER V1         19 0     // via1_drw
+LAYER V2         29 0     // via2_drw
+LAYER V3         49 0     // via3_drw
+LAYER V4         66 0     // via4_drw
+LAYER TV1        125 0    // topvia1_drw
+LAYER TV2        133 0    // topvia2_drw
+LAYER TM1        126 0    // topmetal1_drw
+LAYER TM1F       126 22   // topmetal1_filler
+LAYER TM2        134 0    // topmetal2_drw
+LAYER TM2F       134 22   // topmetal2_filler
+LAYER EDGESEAL   39 0     // edgeseal_drw (edge seal ring exclusion)
+
+// ---------------------------------------------------------------------------
+// Derivations (mirror the KLayout decks)
+// ---------------------------------------------------------------------------
+// Syntax: bare "A OR B" / "A NOT B" — this Calibre build rejects
+// parenthesized layer booleans (LAY7 implicit-layer error, verified).
+// drawing + filler joins used by the ".b" space rules
+M1DF = M1 OR M1F
+M2DF = M2 OR M2F
+M3DF = M3 OR M3F
+M4DF = M4 OR M4F
+M5DF = M5 OR M5F
+TM1DF = TM1 OR TM1F
+TM2DF = TM2 OR TM2F
+
+// vias outside the edge-seal ring: via_lay.not(edgeseal_drw) in KLayout
+V1NS = V1 NOT EDGESEAL
+V2NS = V2 NOT EDGESEAL
+V3NS = V3 NOT EDGESEAL
+V4NS = V4 NOT EDGESEAL
+TV1NS = TV1 NOT EDGESEAL
+TV2NS = TV2 NOT EDGESEAL
+
+// ===========================================================================
+// Fixed-size via checks — transcription note
+// ---------------------------------------------------------------------------
+// KLayout uses without_bbox_min(v)/without_bbox_max(v): the via bounding box
+// must equal v in BOTH dimensions. SVRF has no bbox-equality check, so each
+// "_a" rule is split into:
+//   _a_w : INT  < v     catches any dimension below v (INT = internal width)
+//   _a_A : AREA > v*v   catches any shape exceeding the nominal square
+// A non-square rectangle can only pass both tests when both dimensions equal v.
+// ===========================================================================
+
+// ===========================================================================
+// 5.16  Metal1  (beol/5_16_metal1.drc)
+// ===========================================================================
+
+// Rule M1.a: Min. Metal1 width = 0.16 um            [KLayout id: M1.a]
+M1_a { INT M1 < 0.16 }
+
+// Rule M1.b: Min. Metal1 (drawing + filler) space or notch = 0.18 um
+//                                                   [KLayout id: M1.b]
+M1_b { EXT M1DF < 0.18 }
+
+// ===========================================================================
+// 5.17  Metal2 .. Metal5  (beol/5_17_metaln.drc)
+// ===========================================================================
+
+// Rule Mn.a: Min. Metalm width = 0.20 um            [KLayout id: M2.a]
+M2_a { INT M2 < 0.20 }
+// Rule Mn.b: Min. Metalm (drawing + filler) space or notch = 0.21 um
+//                                                   [KLayout id: M2.b]
+M2_b { EXT M2DF < 0.21 }
+
+//                                                   [KLayout id: M3.a]
+M3_a { INT M3 < 0.20 }
+//                                                   [KLayout id: M3.b]
+M3_b { EXT M3DF < 0.21 }
+
+//                                                   [KLayout id: M4.a]
+M4_a { INT M4 < 0.20 }
+//                                                   [KLayout id: M4.b]
+M4_b { EXT M4DF < 0.21 }
+
+//                                                   [KLayout id: M5.a]
+M5_a { INT M5 < 0.20 }
+//                                                   [KLayout id: M5.b]
+M5_b { EXT M5DF < 0.21 }
+
+// ===========================================================================
+// 5.19  Via1  (beol/5_19_via1.drc)
+// ===========================================================================
+// Rule V1.a: Min. and max. Via1 width = 0.19 um     [KLayout id: V1.a]
+// (KLayout additionally excludes vias on npn13g2l markers; that device layer
+//  does not exist in SG13G2 GDS output of this flow — omission documented.)
+V1_a_w { INT V1NS < 0.19 }
+V1_a_A { AREA V1NS > 0.0361 }
+
+// Rule V1.b: Min. Via1 space = 0.22 um              [KLayout id: V1.b]
+V1_b { EXT V1NS < 0.22 }
+
+// Rule V1.c: Min. Metal1 enclosure of Via1 = 0.01 um [KLayout id: V1.c]
+// KLayout: via1.enclosed(metal1). SVRF ENC order verified on VM:
+// first operand = enclosed (via), second = enclosing (metal).
+V1_c { ENC V1NS M1 < 0.01 }
+
+// ===========================================================================
+// 5.20  Via2 .. Via4  (beol/5_20_vian.drc)
+// ===========================================================================
+// Rule Vn.a: Min./max. Viam width = 0.19 um         [KLayout id: V2.a]
+V2_a_w { INT V2NS < 0.19 }
+V2_a_A { AREA V2NS > 0.0361 }
+// Rule Vn.b: Min. Viam space = 0.22 um              [KLayout id: V2.b]
+V2_b { EXT V2NS < 0.22 }
+// Rule Vn.c: Min. Metal enclosure of Via = 0.005 um [KLayout id: V2.c]
+V2_c { ENC V2NS M2 < 0.005 }
+
+//                                                   [KLayout id: V3.a]
+V3_a_w { INT V3NS < 0.19 }
+V3_a_A { AREA V3NS > 0.0361 }
+//                                                   [KLayout id: V3.b]
+V3_b { EXT V3NS < 0.22 }
+//                                                   [KLayout id: V3.c]
+V3_c { ENC V3NS M3 < 0.005 }
+
+//                                                   [KLayout id: V4.a]
+V4_a_w { INT V4NS < 0.19 }
+V4_a_A { AREA V4NS > 0.0361 }
+//                                                   [KLayout id: V4.b]
+V4_b { EXT V4NS < 0.22 }
+// Rule Vn.c: Min. Metal4 enclosure of Via4 = 0.005 um [KLayout id: V4.c]
+// (vian table zips [via2,via3,via4] with [metal2,metal3,metal4])
+V4_c { ENC V4NS M4 < 0.005 }
+
+// ===========================================================================
+// 5.21  TopVia1  (beol/5_21_topvia1.drc)
+// ===========================================================================
+// Rule TV1.a: Min. and max. TopVia1 width = 0.42 um [KLayout id: TV1.a]
+TV1_a_w { INT TV1NS < 0.42 }
+TV1_a_A { AREA TV1NS > 0.1764 }
+// Rule TV1.b: Min. TopVia1 space = 0.42 um          [KLayout id: TV1.b]
+TV1_b { EXT TV1NS < 0.42 }
+// Rule TV1.c: Min. Metal5 enclosure of TopVia1 = 0.10 um [KLayout id: TV1.c]
+TV1_c { ENC TV1NS M5 < 0.10 }
+// Rule TV1.d: Min. TopMetal1 enclosure of TopVia1 = 0.42 um [KLayout id: TV1.d]
+TV1_d { ENC TV1NS TM1 < 0.42 }
+
+// ===========================================================================
+// 5.24  TopVia2  (beol/5_24_topvia2.drc)
+// ===========================================================================
+// Rule TV2.a: Min. and max. TopVia2 width = 0.90 um [KLayout id: TV2.a]
+TV2_a_w { INT TV2NS < 0.90 }
+TV2_a_A { AREA TV2NS > 0.81 }
+// Rule TV2.b: Min. TopVia2 space = 1.06 um          [KLayout id: TV2.b]
+TV2_b { EXT TV2NS < 1.06 }
+// Rule TV2.c: Min. TopMetal1 enclosure of TopVia2 = 0.50 um [KLayout id: TV2.c]
+TV2_c { ENC TV2NS TM1 < 0.50 }
+// Rule TV2.d: Min. TopMetal2 enclosure of TopVia2 = 0.50 um [KLayout id: TV2.d]
+TV2_d { ENC TV2NS TM2 < 0.50 }
+
+// ===========================================================================
+// 5.22  TopMetal1  (beol/5_22_topmetal1.drc)
+// ===========================================================================
+// Rule TM1.a: Min. TopMetal1 width = 1.64 um        [KLayout id: TM1.a]
+TM1_a { INT TM1 < 1.64 }
+// Rule TM1.b: Min. TopMetal1 (drawing + filler) space or notch = 1.64 um
+//                                                   [KLayout id: TM1.b]
+TM1_b { EXT TM1DF < 1.64 }
+
+// ===========================================================================
+// 5.25  TopMetal2  (beol/5_25_topmetal2.drc)
+// ===========================================================================
+// Rule TM2.a: Min. TopMetal2 width = 2.00 um        [KLayout id: TM2.a]
+TM2_a { INT TM2 < 2.00 }
+// Rule TM2.b: Min. TopMetal2 (drawing + filler) space or notch = 2.00 um
+//                                                   [KLayout id: TM2.b]
+TM2_b { EXT TM2DF < 2.00 }
+
+
+--- STANDARD VERIFICATION RULE FILE COMPILATION MODULE COMPLETED.  CPU TIME = 0  REAL TIME = 0  LVHEAP = 1/3/3
+
+--- CALIBRE_* ENVIRONMENT VARIABLES:
+
+CALIBRE_ATOMIC_LVHEAP=0
+CALIBRE_CMD_LINE='/opt/siemens/calibre/pkgs/icv/pvt/calibre  -drc -hier sg13g2_beol_gen.drc'
+CALIBRE_HOME=/opt/siemens/calibre
+CALIBRE_INITIAL_CMD_LINE='/opt/siemens/calibre/bin/calibre -drc -hier sg13g2_beol_gen.drc'
+CALIBRE_MTFLEX_LOGTAG=samjna.asnaviram.1035983.2026_0826_0234
+CALIBRE_READDB_LD_LIBRARY_PATH=/opt/siemens/calibre/shared/pkgs/icv/tools/calibre_client/lib/64:/opt/siemens/calibre/pkgs/calibre_base/lib64:/opt/siemens/calibre/pkgs/icv_lib/lib64:/opt/siemens/calibre/pkgs/icv_qt5_comp/plugins:/opt/siemens/calibre/pkgs/icv_oa/22.41p004/lib/linux_rhel68_gcc44x_64/opt
+CALIBRE_SKIP_OS_CHECKS=
+
+
+--- VARIABLES:
+
+--- DEFINES:
+
+--- SELECTED RULE CHECKS:
+    M1_a
+    M1_b
+    M2_a
+    M2_b
+    M3_a
+    M3_b
+    M4_a
+    M4_b
+    M5_a
+    M5_b
+    V1_a_w
+    V1_a_A
+    V1_b
+    V1_c
+    V2_a_w
+    V2_a_A
+    V2_b
+    V2_c
+    V3_a_w
+    V3_a_A
+    V3_b
+    V3_c
+    V4_a_w
+    V4_a_A
+    V4_b
+    V4_c
+    TV1_a_w
+    TV1_a_A
+    TV1_b
+    TV1_c
+    TV1_d
+    TV2_a_w
+    TV2_a_A
+    TV2_b
+    TV2_c
+    TV2_d
+    TM1_a
+    TM1_b
+    TM2_a
+    TM2_b
+
+--- UNSELECTED RULE CHECKS (IMPLICIT):
+
+--- UNSELECTED RULE CHECKS (EXPLICIT):
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-----                  CALIBRE::DRC-H - LICENSING MODULE                   -----
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+
+//  Applying licensing policy...
+//  calibrehdrc license acquired.
+//  calibredrc license acquired.
+
+//  Licensed Products
+//  -----------------
+//  Base products running on 1 core:
+//  - DRC (Hierarchical)
+
+--- CALIBRE::DRC-H LICENSING MODULE COMPLETED.  CPU TIME = 0  REAL TIME = 1
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-----                   CALIBRE LAYOUT DATA INPUT MODULE                   -----
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+--- LAYOUT SYSTEM = GDS
+--- LAYOUT MAGNIFICATION = 1
+
+--------------------------------------------------------------------------------
+-----                     GDS FILE SUMMARY INFORMATION                     -----
+--------------------------------------------------------------------------------
+
+GDS FILENAME:        chip_top_logo_fill.gds
+GDS VERSION:         600
+LIBRARY NAME:        chip_top
+LAST MODIFIED:       ON 2026/5/18 AT 21:50:27
+LAST ACCESSED:       ON 2026/5/18 AT 21:50:27
+DATABASE PRECISION:  0.001 user units per database unit
+PHYSICAL PRECISION:  1e-09 meters per database unit
+MAGNIFICATION:       1
+SIZE:                50336040
+
+--------------------------------------------------------------------------------
+-----                 GDS INPUT DATA FOR INDIVIDUAL CELLS                  -----
+--------------------------------------------------------------------------------
+     CELL NAME                  PLACEMENTS   ARRAYS   POLYGONS    PATHS    TEXTS
+--------------------------------------------------------------------------------
+M1_GatPoly_CDNS_7558030484048            0        0          3        0        0
+VIA_M1_Activ_db_0x02835b9b               0        0          3        0        0
+RM_IHPSG13_1P_BITKIT_CELL_SUB            4        0         26        5        3
+lvsres_db_0x02834b9a                     0        0          4        0        2
+lvsres_db_0x0283509a                     0        0          4        0        2
+RM_IHPSG13_1P_BITKIT_CELL                5        0         14        1        9
+RM_IHPSG13_1P_BITKIT_CELL_2x1            2        0          4        3        0
+RM_IHPSG13_1P_BITKIT_TAP                 2        0         20        5        0
+viagen34_CDNS_7558030484049              0        0          9        0        0
+RM_IHPSG13_1P_BITKIT_CELL_CORNER         1        0         12        2        0
+RM_IHPSG13_1P_BITKIT_EDGE_LR             3        0         26        6        6
+RM_IHPSG13_1P_BITKIT_16x2_EDGE_TB
+                                         0        0          0        0        0
+RM_IHPSG13_1P_BITKIT_16x2_TAP            0        0          0        0        0
+RM_IHPSG13_1P_BITKIT_16x2_SRAM          20        0         42        0       44
+lvsres_db_0x04007e9a                     0        0          4        0        2
+viagen23_CDNS_7558030484038              0        0          6        0        0
+RSC_IHPSG13_FILLCAP8                     0        0         74        0        2
+RSC_IHPSG13_FILL2                        0        0         14        0        2
+lvsres_db_0x0400b71a                     0        0          4        0        2
+RSC_IHPSG13_NAND2X2                      0        0         38        0        5
+RSC_IHPSG13_NOR3X2                       0        0         45        0        6
+RSC_IHPSG13_LHPQX2                       0        0         81        0        5
+RSC_IHPSG13_NAND3X2                      0        0         46        0        6
+M3_M2_CDNS_7558030484037                 0        0          4        0        0
+M3_M2_CDNS_7558030484036                 0        0          4        0        0
+viagen34_CDNS_7558030484035              0        0          8        0        0
+M3_M2_CDNS_7558030484034                 0        0          4        0        0
+viagen34_CDNS_7558030484033              0        0          9        0        0
+viagen23_CDNS_7558030484032              0        0          4        0        0
+RSC_IHPSG13_FILL1                        0        0         12        0        2
+RSC_IHPSG13_INVX4                        0        0         35        0        4
+RSC_IHPSG13_INVX2                        0        0         30        0        4
+viagen12_CDNS_7558030484029              0        0          4        0        0
+viagen23_CDNS_7558030484028              0        0          5        0        0
+viagen12_CDNS_7558030484027              0        0          5        0        0
+viagen12_CDNS_7558030484026              0        0          4        0        0
+viagen23_CDNS_7558030484025              0        0          4        0        0
+viagen23_CDNS_7558030484024              0        0          4        0        0
+M2_M1_CDNS_7558030484023                 0        0          4        0        0
+viagen12_CDNS_7558030484022              0        0          6        0        0
+viagen12_CDNS_7558030484021              0        0          4        0        0
+viagen23_CDNS_7558030484020              0        0          4        0        0
+RSC_IHPSG13_DFPQD_MSAFFX2N_half          0        0         84        0        0
+RSC_IHPSG13_CINVX2                       0        0         26        0        4
+RSC_IHPSG13_FILLCAP4                     0        0         37        0        2
+M2_M1_CDNS_7558030484018                 0        0          4        0        0
+M2_M1_CDNS_7558030484011                 0        0          4        0        0
+RM_IHPSG13_1P_BITKIT_16x2_CORNER         0        0          0        0        0
+RM_IHPSG13_1P_BITKIT_16x2_LE_con_corner
+                                         0        0          0        0        0
+RM_IHPSG13_1P_BITKIT_16x2_POWER_ramtap
+                                         0        0          0        0        0
+RM_IHPSG13_1P_BITKIT_16x2_TAP_LR         0        0          0        0        0
+RM_IHPSG13_1P_BITKIT_16x2_LE_con_tap_lr
+                                         0        0          0        0        0
+RM_IHPSG13_1P_BITKIT_16x2_POWER_ramblk
+                                        17        0          2        0        0
+RM_IHPSG13_1P_BITKIT_16x2_EDGE_LR
+                                        18        0         18        0       18
+RM_IHPSG13_1P_COLUMN_256                 2        7          0        0        0
+RM_IHPSG13_1P_BITKIT_16x2_LE_con_edge_lr
+                                         0        0          0        0        0
+RSC_IHPSG13_WLDRVX4                      0        0         41        0        4
+viagen12_CDNS_7558030484047              0        0          5        0        0
+M2_M1_CDNS_7558030484046                 0        0          4        0        0
+M3_M2_CDNS_7558030484045                 0        0          4        0        0
+M3_M2_CDNS_7558030484044                 0        0          4        0        0
+RSC_IHPSG13_CBUFX4                       0        0         42        0        4
+M3_M2_CDNS_7558030484043                 0        0          4        0        0
+viagen23_CDNS_7558030484042              0        0          4        0        0
+RSC_IHPSG13_CDLYX1_DUMMY                 1        0         45        0        4
+RSC_IHPSG13_CDLYX1                       0        0         39        0        4
+RSC_IHPSG13_MX2IX1                       0        0         53        0        6
+RSC_IHPSG13_CBUFX8                       0        0         59        0        4
+RSC_IHPSG13_TIEL                         0        0         25        0        3
+RSC_IHPSG13_OA12X1                       0        0         55        0        6
+RSC_IHPSG13_CNAND2X2                     0        0         38        0        5
+RSC_IHPSG13_DFNQX2                       0        0        137        0        5
+RSC_IHPSG13_XOR2X2                       0        0         70        0        5
+RSC_IHPSG13_CINVX4                       0        0         33        0        4
+RSC_IHPSG13_CGATEPX4                     0        0         89        0        5
+RSC_IHPSG13_MX2X2                        0        0         63        0        6
+RSC_IHPSG13_CDLYX2                       0        0         40        0        4
+viagen12_CDNS_7558030484041              0        0          6        0        0
+viagen12_CDNS_7558030484040              0        0          4        0        0
+M3_M2_CDNS_7558030484039                 0        0          4        0        0
+RM_IHPSG13_1P_ROWREG0                  182        0        137        0        0
+RSC_IHPSG13_CINVX8                       0        0         44        0        4
+RM_IHPSG13_1P_DEC_LE_l2wire              9        1          5        0        0
+RM_IHPSG13_1P_DEC_LE_l1wire              7        1          5        0        0
+RM_IHPSG13_1P_DEC_LE_l1empty             2        1          1        0        0
+RM_IHPSG13_1P_DEC01                      5        5         11        0        6
+RM_IHPSG13_1P_DEC03                      5        5         11        0        6
+RM_IHPSG13_1P_DEC_LE_l2empty             2        1          1        0        0
+RM_IHPSG13_1P_DEC02                      7        5          9        0        6
+RM_IHPSG13_1P_DEC00                      7        5          9        0        6
+RM_IHPSG13_1P_DEC04                    185       27        190        0       27
+RM_IHPSG13_1P_DEC_LE_l0wire              2        1         10        0        0
+RM_IHPSG13_1P_DEC_LE_tap                 0        0         22        0        0
+RM_IHPSG13_1P_ROWDEC0                   32        0         14        0        0
+M3_M2_CDNS_7558030484031                 0        0          4        0        0
+viagen23_CDNS_7558030484030              0        0          6        0        0
+RSC_IHPSG13_CBUFX2                       0        0         37        0        4
+RSC_IHPSG13_TIEH                         0        0         25        0        3
+RM_IHPSG13_1P_BLDRV                     29        0        198        0       12
+RSC_IHPSG13_CINVX4_WN                    0        0         32        0        4
+RSC_IHPSG13_NOR2X2                       0        0         37        0        5
+lvsres_db_0x0283151a                     0        0          4        0        2
+RSC_IHPSG13_DFPQD_MSAFFX2N               2        0         30        0        8
+RSC_IHPSG13_AND2X2                       0        0         46        0        5
+RSC_IHPSG13_DFNQMX2IX1                   0        0        133        0        8
+viagen12_CDNS_7558030484019              0        0          4        0        0
+M3_M2_CDNS_7558030484017                 0        0          4        0        0
+viagen23_CDNS_7558030484016              0        0          6        0        0
+viagen23_CDNS_7558030484015              0        0          6        0        0
+M3_M2_CDNS_7558030484014                 0        0          4        0        0
+M3_M2_CDNS_7558030484013                 0        0          4        0        0
+M2_M1_CDNS_7558030484012                 0        0          4        0        0
+M3_M2_CDNS_7558030484010                 0        0          4        0        0
+viagen34_CDNS_755803048409               0        0          9        0        0
+viagen23_CDNS_755803048408               0        0          4        0        0
+M2_M1_CDNS_755803048407                  0        0          4        0        0
+M3_M2_CDNS_755803048406                  0        0          4        0        0
+M3_M2_CDNS_755803048405                  0        0          4        0        0
+viagen23_CDNS_755803048404               0        0          4        0        0
+M2_M1_CDNS_755803048403                  0        0          4        0        0
+M2_M1_CDNS_755803048402                  0        0          4        0        0
+M2_M1_CDNS_755803048401                  0        0          4        0        0
+viagen12_CDNS_755803048400               0        0          6        0        0
+via_stack$15                             0        0          9        0        0
+via_stack$7                              0        0         16        0        0
+via_stack$11                             0        0         30        0        0
+via_stack$8                              0        0          4        0        0
+via_stack$17                             0        0         11        0        0
+via_stack$12                             0        0         59        0        0
+via_stack$5                              0        0          6        0        0
+via_stack$16                             0        0         66        0        0
+via_stack$13                             0        0         80        0        0
+via_stack$21                             0        0        471        0        0
+nmos                                     0        0        387        0       24
+pmos                                     0        0        735        0       24
+sg13g2_SecondaryProtection               0        0        233        0        9
+sg13g2_io_inv_x1                         0        0         47        0        5
+sg13g2_LevelUp                           0        0        260        0        6
+sg13g2_io_nor2_x1                        0        0         58        0        6
+sg13g2_io_tie                            0        0         17        0        3
+sg13g2_io_nand2_x1                       0        0         58        0        6
+sg13g2_LevelUpInv                        0        0        266        0        6
+VIA_Via3_XY$1                            0        0          3        0        0
+VIA_Via2_YX$1                            0        0          3        0        0
+VIA_Via1_XY$1                            0        0          3        0        0
+VIA_Via1_YY$1                            0        0          3        0        0
+VIA_via1_2_2200_440_1_5_410_410$1
+                                         0        0          7        0        0
+VIA_via2_3_2200_440_1_5_410_410$1
+                                         0        0          7        0        0
+VIA_via3_4_2200_440_1_5_410_410$1
+                                         0        0          7        0        0
+VIA_via4_5_2200_440_1_5_410_410$1
+                                         0        0          7        0        0
+VIA_via5_6_2200_440_1_2_840_840$1
+                                         0        0          4        0        0
+sg13g2_buf_1$1                           0        0         40        0        4
+sg13g2_dlygate4sd3_1$1                   0        0         87        0        4
+sg13g2_buf_16$1                          0        0        229        0        4
+sg13g2_tiehi$1                           0        0         44        0        3
+sg13g2_dfrbpq_1$1                        0        0        170        0        6
+sg13g2_xnor2_1$1                         0        0         80        0        5
+sg13g2_nor4_2$1                          0        0        107        0        9
+sg13g2_mux2_1$1                          0        0         92        0        6
+sg13g2_nor3_1$1                          0        0         59        0        6
+sg13g2_nand2_1$1                         0        0         51        0        5
+sg13g2_nor2b_1$1                         0        0         48        0        5
+sg13g2_and2_1$1                          0        0         56        0        5
+sg13g2_a21oi_1$1                         0        0         47        0        6
+sg13g2_or3_1$1                           0        0         74        0        6
+sg13g2_o21ai_1$1                         0        0         54        0        6
+sg13g2_nand2_2$1                         0        0         62        0        5
+sg13g2_buf_4$1                           0        0         81        0        4
+sg13g2_nand3_1$1                         0        0         61        0        6
+sg13g2_nor2_1$1                          0        0         50        0        5
+sg13g2_xor2_1$1                          0        0         67        0        5
+sg13g2_nand4_1$1                         0        0         59        0        7
+sg13g2_inv_1$1                           0        0         40        0        4
+sg13g2_fill_2$1                          0        0         20        0        2
+sg13g2_fill_1$1                          0        0         16        0        2
+sg13g2_decap_4$1                         0        0         32        0        2
+sg13g2_decap_8$1                         0        0         45        0        2
+RM_IHPSG13_1P_MATRIX_256x64              6       29          0        0        0
+RM_IHPSG13_1P_DLY_4                      8        0         11        0        4
+RM_IHPSG13_1P_WLDRV16X4_tap              0        0          6        0        0
+RM_IHPSG13_1P_WLDRV16X4                 72        4        108        0       34
+RM_IHPSG13_1P_COLDRV13_FILL1             9        0         57        0        0
+RM_IHPSG13_1P_COLDRV13X4                75        5        137        0       36
+RM_IHPSG13_1P_DLY_2                      8        0         11        0        4
+RM_IHPSG13_1P_DLY_MUX                   17        0         11        0        0
+RM_IHPSG13_1P_COLDEC2                  220        6        229        0       22
+RM_IHPSG13_1P_CTRL                     241        0        216        0       21
+RM_IHPSG13_1P_ROWREG8                   63        1         49        0       28
+RM_IHPSG13_1P_ROWDEC8                  156        1        284        0      268
+RM_IHPSG13_1P_COLDRV13_FILL4C2          13        0         21        0        0
+RM_IHPSG13_1P_COLDRV13_FILL1C2           2        0         17        0        0
+RM_IHPSG13_1P_COLDRV13_FILL4            38        0         63        0        0
+RM_IHPSG13_1P_COLCTRL2                 183        2        271        0       45
+RM_IHPSG13_1P_COLCTRL2_end               0        0          1        0        0
+inverter                                58        0        194        0        4
+Via                                      0        0          6        0        0
+via_stack$19                             0        0         22        0        0
+via_stack                                0        0         13        0        0
+bondpad                                  0        0       1731        0        0
+sg13g2_Clamp_N43N43D4R                   0        0       8294        0       26
+sg13g2_RCClampResistor                   0        0        214        0       28
+sg13g2_RCClampInverter                   0        0       3984        0        5
+sg13g2_DCNDiode                          0        0       1777        0       10
+sg13g2_DCPDiode                          0        0       1779        0       10
+sg13g2_LevelDown                         1        0        157        0        7
+sg13g2_GateDecode                        6        0         41        0        7
+sg13g2_Clamp_P15N15D                     0        0       3003        0       13
+sg13g2_Clamp_N15N15D                     0        0       1813        0       12
+sg13g2_GateLevelUpInv                    2        0         12        0        6
+sg13g2_Clamp_N20N0D                      0        0       2087        0       14
+sg13g2_Clamp_P20N0D                      0        0       3605        0       15
+sealring                                 0        0        305        0        2
+sg13g2_antennanp                         0        0         33        0        5
+sg13g2_decap_8                           0        0         45        0        2
+sg13g2_decap_4                           0        0         32        0        2
+sg13g2_fill_1                            0        0         16        0        2
+sg13g2_fill_2                            0        0         20        0        2
+sg13g2_ip__bondpad_70x70                 1        0          0        0        0
+sg13g2_Corner                            0        0     172538        0       74
+sg13g2_Filler4000                        0        0      18999        0       43
+sg13g2_Filler2000                        0        0       9154        0       43
+sg13g2_Filler1000                        0        0       4254        0       43
+sg13g2_Filler400                         0        0       1459        0       43
+sg13g2_Filler200                         0        0        325        0       41
+sg13g2_xor2_1                            0        0         67        0        5
+sg13g2_xnor2_1                           0        0         80        0        5
+sg13g2_IOPadIn                           3        0      82972        0       43
+sg13g2_buf_16                            0        0        229        0        4
+sg13g2_inv_1                             0        0         40        0        4
+sg13g2_IOPadAnalog                       5        0      49664        0       45
+sg13g2_IOPadInOut30mA                    6        0      50051        0       47
+sg13g2_IOPadIOVdd                        3        0      25770        0       42
+sg13g2_IOPadIOVss                        2        0      97040        0       40
+sg13g2_IOPadOut30mA                      5        0      50086        0       43
+sg13g2_IOPadVdd                          3        0      25374        0       46
+sg13g2_IOPadVss                          2        0      87236        0       40
+sg13g2_dlygate4sd3_1                     0        0         87        0        4
+counter_top                           1658        0        103      383       13
+inverter_top                            22        0         71        0       24
+sg13g2_tielo                             0        0         45        0        3
+RM_IHPSG13_1P_1024x32_c2_bm_bist        13       14        391        0      294
+sg13g2_tiehi                             0        0         44        0        3
+sg13g2_ip__jku                           0        0          5        0        0
+sg13g2_ip__jku_names                     0        0         17        0        0
+VIA_via5_6_2200_2810_2_2_840_840         0        0          6        0        0
+VIA_via4_5_2810_2810_6_6_480_480         0        0         38        0        0
+VIA_via6_7_2200_2200_1_1_1960_1960
+                                         0        0          3        0        0
+VIA_via5_6_2200_2200_2_2_840_840         0        0          6        0        0
+VIA_via6_7_18000_13330_6_9_1960_1960
+                                         0        0         56        0        0
+VIA_via6_7_18000_3330_1_9_1960_1960
+                                         0        0         11        0        0
+VIA_via6_7_15000_15000_7_7_1960_1960
+                                         0        0         51        0        0
+VIA_via6_7_15000_2200_1_7_1960_1960
+                                         0        0          9        0        0
+VIA_via6_7_15000_13330_6_7_1960_1960
+                                         0        0         44        0        0
+VIA_via6_7_15000_3330_1_7_1960_1960
+                                         0        0          9        0        0
+VIA_via6_7_2200_15000_7_1_1960_1960
+                                         0        0          9        0        0
+VIA_via5_6_2200_440_1_2_840_840          0        0          4        0        0
+VIA_via4_5_2200_440_1_5_410_410          0        0          7        0        0
+VIA_via3_4_2200_440_1_5_410_410          0        0          7        0        0
+VIA_via2_3_2200_440_1_5_410_410          0        0          7        0        0
+VIA_via1_2_2200_440_1_5_410_410          0        0          7        0        0
+VIA_Via2_YX                              0        0          3        0        0
+VIA_Via1_YY                              0        0          3        0        0
+VIA_Via1_XY                              0        0          3        0        0
+VIA_Via3_DC1B                            0        0          4        0        0
+VIA_Via2_DC1B                            0        0          4        0        0
+VIA_Via3_XY                              0        0          3        0        0
+VIA_Via3_YY                              0        0          3        0        0
+VIA_Via4_YX                              0        0          3        0        0
+TM2_FILL_CELL                            0        0          1        0        0
+TM1_FILL_CELL                            0        0          1        0        0
+Met5_S_FILL_CELL                         0        0          1        0        0
+Met5_M_FILL_CELL                         0        0          1        0        0
+Met4_S_FILL_CELL                         0        0          1        0        0
+Met4_M_FILL_CELL                         0        0          1        0        0
+Met3_S_FILL_CELL                         0        0          1        0        0
+Met3_M_FILL_CELL                         0        0          1        0        0
+Met2_S_FILL_CELL                         0        0          1        0        0
+Met2_M_FILL_CELL                         0        0          1        0        0
+Met1_S_FILL_CELL                         0        0          1        0        0
+Met1_M_FILL_CELL                         0        0          1        0        0
+GatP_FILL_CELL                           0        0          1        0        0
+Act_FILL_CELL                            0        0          1        0        0
+chip_top                             55363        0        110     3503       32
+chip_top_logo                            0        0       4455        0        0
+chip_top_logo_fill                    3003    16572          0        0        0
+
+--------------------------------------------------------------------------------
+-----                LAYOUT DATABASE CONSTRUCTOR CONCLUSION                -----
+--------------------------------------------------------------------------------
+
+DATABASE PREP:                      CPU TIME = 0  REAL TIME = 0
+DATABASE READ:                      CPU TIME = 0  REAL TIME = 0
+TEXT UPDATE:                        CPU TIME = 0  REAL TIME = 0
+MISC:                               CPU TIME = 0  REAL TIME = 0
+RECURSIVE REFERENCE CHECK:          CPU TIME = 0  REAL TIME = 0
+EXTENT UPDATE:                      CPU TIME = 0  REAL TIME = 0
+
+NOTE: UNUSED geometric data is present on the following layer/datatype pairs:
+    LAYER = 1 DATATYPE = 0
+    LAYER = 1 DATATYPE = 22
+    LAYER = 5 DATATYPE = 0
+    LAYER = 5 DATATYPE = 2
+    LAYER = 5 DATATYPE = 22
+    LAYER = 6 DATATYPE = 0
+    LAYER = 9 DATATYPE = 0
+    LAYER = 14 DATATYPE = 0
+    LAYER = 16 DATATYPE = 0
+    LAYER = 25 DATATYPE = 0
+    LAYER = 28 DATATYPE = 0
+    LAYER = 31 DATATYPE = 0
+    LAYER = 32 DATATYPE = 0
+    LAYER = 40 DATATYPE = 0
+    LAYER = 41 DATATYPE = 0
+    LAYER = 44 DATATYPE = 0
+    LAYER = 51 DATATYPE = 0
+    LAYER = 52 DATATYPE = 0
+    LAYER = 99 DATATYPE = 31
+    LAYER = 111 DATATYPE = 0
+    LAYER = 128 DATATYPE = 0
+    LAYER = 160 DATATYPE = 0
+    LAYER = 189 DATATYPE = 0
+    LAYER = 189 DATATYPE = 4
+
+NOTE: USED geometric data is present on the following layer/datatype pairs:
+    SIMPLE LAYER = 8
+        LAYER = 8 DATATYPE = 0
+        LAYER = 8 DATATYPE = 2
+        LAYER = 8 DATATYPE = 22
+        LAYER = 8 DATATYPE = 29
+    SIMPLE LAYER = 10
+        LAYER = 10 DATATYPE = 0
+        LAYER = 10 DATATYPE = 2
+        LAYER = 10 DATATYPE = 22
+        LAYER = 10 DATATYPE = 29
+    SIMPLE LAYER = 19
+        LAYER = 19 DATATYPE = 0
+    SIMPLE LAYER = 29
+        LAYER = 29 DATATYPE = 0
+    SIMPLE LAYER = 30
+        LAYER = 30 DATATYPE = 0
+        LAYER = 30 DATATYPE = 2
+        LAYER = 30 DATATYPE = 22
+        LAYER = 30 DATATYPE = 29
+    SIMPLE LAYER = 39
+        LAYER = 39 DATATYPE = 0
+        LAYER = 39 DATATYPE = 4
+    SIMPLE LAYER = 49
+        LAYER = 49 DATATYPE = 0
+    SIMPLE LAYER = 50
+        LAYER = 50 DATATYPE = 0
+        LAYER = 50 DATATYPE = 2
+        LAYER = 50 DATATYPE = 22
+    SIMPLE LAYER = 66
+        LAYER = 66 DATATYPE = 0
+    SIMPLE LAYER = 67
+        LAYER = 67 DATATYPE = 0
+        LAYER = 67 DATATYPE = 2
+        LAYER = 67 DATATYPE = 22
+    SIMPLE LAYER = 125
+        LAYER = 125 DATATYPE = 0
+    SIMPLE LAYER = 126
+        LAYER = 126 DATATYPE = 0
+        LAYER = 126 DATATYPE = 2
+        LAYER = 126 DATATYPE = 22
+        LAYER = 126 DATATYPE = 23
+    SIMPLE LAYER = 133
+        LAYER = 133 DATATYPE = 0
+    SIMPLE LAYER = 134
+        LAYER = 134 DATATYPE = 0
+        LAYER = 134 DATATYPE = 2
+        LAYER = 134 DATATYPE = 22
+        LAYER = 134 DATATYPE = 23
+
+NOTE: The following required simple layers are EMPTY:
+    0
+    22
+
+WRAPUP:                             CPU TIME = 0  REAL TIME = 0
+
+--- LAYOUT DATABASE CONSTRUCTOR COMPLETED.  CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/6/6
+
+CONSTRUCTING HIERARCHICAL DATABASE
+    COPYING LAYOUT DATABASE
+    COPY COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/5/6
+    (P=84723 A=8635(285141) AX=4317(56356) AY=1622(38686) AD=0(0) D=5)
+    RULE FILE INFO  A:0 C:0 F:0 L:0 M:0
+    CLONE STATE: LCTP(Y/N/U) = U LCRP(Y/N/U) = U LCXP(Y/N/U) = U LCYP(Y/N/U) = U LITHO(0/1/2) = 0 DFM(0/1/2) = 0 MAGXY(0/1) = 0
+    PROCESSING TEXT
+    ELIMINATING DUPLICATE TEXT
+    DUPLICATE TEXT ELIMINATION COMPLETE (0 -> 0 = 0). CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/5/6
+    ELIMINATING EMPTY CELLS
+    EMPTY CELL ELIMINATION COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/5/6
+    COMPUTING RECTANGULAR EXTENTS
+    RECTANGULAR EXTENTS COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/5/6
+    IDENTIFYING TOP LAYER CELLS
+    TOP LAYER CELL IDENTIFICATION COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/5/6
+    IDENTIFYING VERY SMALL CELLS
+        Met2_S_FILL_CELL
+        Met5_S_FILL_CELL
+        Met3_S_FILL_CELL
+        Met1_S_FILL_CELL
+        Met4_S_FILL_CELL
+        Met3_M_FILL_CELL
+        Met1_M_FILL_CELL
+        TM2_FILL_CELL
+        TM1_FILL_CELL
+        Met5_M_FILL_CELL
+        Met4_M_FILL_CELL
+        Met2_M_FILL_CELL
+        VIA_via5_6_2200_440_1_2_840_840
+        VIA_Via1_YY
+        VIA_via5_6_2200_2200_2_2_840_840
+        via_stack
+        Via
+        via_stack$5
+        via_stack$17
+        via_stack$8
+        VIA_via5_6_2200_440_1_2_840_840$1
+        VIA_Via1_YY$1
+        VIA_Via3_YY
+        M3_M2_CDNS_755803048405
+        M2_M1_CDNS_755803048402
+        M3_M2_CDNS_7558030484013
+        M2_M1_CDNS_7558030484011
+        M2_M1_CDNS_7558030484018
+        viagen23_CDNS_7558030484015
+        M2_M1_CDNS_755803048403
+        viagen23_CDNS_7558030484016
+        viagen12_CDNS_7558030484019
+        M3_M2_CDNS_7558030484014
+        M3_M2_CDNS_7558030484017
+        M3_M2_CDNS_7558030484010
+        M3_M2_CDNS_755803048406
+        M2_M1_CDNS_755803048407
+        M2_M1_CDNS_755803048401
+        viagen23_CDNS_7558030484020
+        viagen12_CDNS_7558030484021
+        M2_M1_CDNS_7558030484023
+        viagen23_CDNS_7558030484024
+        viagen23_CDNS_7558030484025
+        viagen23_CDNS_7558030484030
+        M3_M2_CDNS_7558030484031
+        M3_M2_CDNS_7558030484036
+        M3_M2_CDNS_7558030484034
+        viagen23_CDNS_7558030484038
+        M3_M2_CDNS_7558030484039
+        viagen12_CDNS_7558030484040
+        viagen12_CDNS_7558030484041
+        viagen23_CDNS_7558030484042
+        M3_M2_CDNS_7558030484044
+        M3_M2_CDNS_7558030484045
+        M2_M1_CDNS_7558030484046
+        VIA_M1_Activ_db_0x02835b9b
+        M1_GatPoly_CDNS_7558030484048
+    VERY SMALL CELL IDENTIFICATION COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/5/6
+    CHECKING ACUTE/SKEW/ANGLED/OFFGRID
+    ELIMINATING DUPLICATE PLACEMENTS
+        VIA_via6_7_2200_2200_1_1_1960_1960 in chip_top at (1064.38,536.56)
+        VIA_via6_7_2200_2200_1_1_1960_1960 in chip_top at (1133.78,530.36)
+        VIA_via6_7_2200_2200_1_1_1960_1960 in chip_top at (982.58,1059.56)
+        VIA_via6_7_2200_2200_1_1_1960_1960 in chip_top at (1133.78,1059.56)
+        VIA_via6_7_2200_2200_1_1_1960_1960 in chip_top at (1058.18,1059.56)
+    DUPLICATE PLACEMENT ELIMINATION COMPLETE (84719 -> 84714 = 5). CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/7
+    FLATTENING VERY SMALL CELL PLACEMENTS
+        Met2_S_FILL_CELL (simple=3144 array=1898 total=19386)
+        Met5_S_FILL_CELL (simple=4579 array=942 total=19476)
+        Met3_S_FILL_CELL (simple=3699 array=1219 total=21038)
+        Met1_S_FILL_CELL (simple=565 array=505 total=12068)
+        Met4_S_FILL_CELL (simple=4049 array=1074 total=20003)
+        Met3_M_FILL_CELL (simple=141 array=528 total=28993)
+        Met1_M_FILL_CELL (simple=36 array=283 total=36099)
+        TM2_FILL_CELL (simple=19 array=148 total=5766)
+        TM1_FILL_CELL (simple=26 array=126 total=5651)
+        Met5_M_FILL_CELL (simple=51 array=285 total=30706)
+        Met4_M_FILL_CELL (simple=119 array=359 total=30760)
+        Met2_M_FILL_CELL (simple=763 array=1228 total=71820)
+        VIA_via5_6_2200_440_1_2_840_840 (simple=1948 array=0 total=1948)
+        VIA_Via1_YY (simple=43 array=0 total=43)
+        VIA_via5_6_2200_2200_2_2_840_840 (simple=16 array=0 total=16)
+        via_stack (simple=4 array=0 total=4)
+        Via (simple=8 array=0 total=8)
+        via_stack$5 (simple=11 array=0 total=11)
+        via_stack$17 (simple=10 array=0 total=10)
+        via_stack$8 (simple=2 array=0 total=2)
+        VIA_via5_6_2200_440_1_2_840_840$1 (simple=57 array=0 total=57)
+        VIA_Via1_YY$1 (simple=87 array=0 total=87)
+        VIA_Via3_YY (simple=2 array=0 total=2)
+        M3_M2_CDNS_755803048405 (simple=34 array=0 total=34)
+        M2_M1_CDNS_755803048402 (simple=21 array=0 total=21)
+        M3_M2_CDNS_7558030484013 (simple=8 array=0 total=8)
+        M2_M1_CDNS_7558030484011 (simple=294 array=0 total=294)
+        M2_M1_CDNS_7558030484018 (simple=73 array=0 total=73)
+        viagen23_CDNS_7558030484015 (simple=65 array=0 total=65)
+        M2_M1_CDNS_755803048403 (simple=6 array=0 total=6)
+        viagen23_CDNS_7558030484016 (simple=2 array=0 total=2)
+        viagen12_CDNS_7558030484019 (simple=1 array=0 total=1)
+        M3_M2_CDNS_7558030484014 (simple=1 array=0 total=1)
+        M3_M2_CDNS_7558030484017 (simple=1 array=0 total=1)
+        M3_M2_CDNS_7558030484010 (simple=3 array=0 total=3)
+        M3_M2_CDNS_755803048406 (simple=2 array=0 total=2)
+        M2_M1_CDNS_755803048407 (simple=1 array=0 total=1)
+        M2_M1_CDNS_755803048401 (simple=1 array=0 total=1)
+        viagen23_CDNS_7558030484020 (simple=2 array=0 total=2)
+        viagen12_CDNS_7558030484021 (simple=14 array=0 total=14)
+        M2_M1_CDNS_7558030484023 (simple=1 array=0 total=1)
+        viagen23_CDNS_7558030484024 (simple=2 array=0 total=2)
+        viagen23_CDNS_7558030484025 (simple=2 array=0 total=2)
+        viagen23_CDNS_7558030484030 (simple=51 array=0 total=51)
+        M3_M2_CDNS_7558030484031 (simple=1 array=0 total=1)
+        M3_M2_CDNS_7558030484036 (simple=34 array=0 total=34)
+        M3_M2_CDNS_7558030484034 (simple=9 array=0 total=9)
+        viagen23_CDNS_7558030484038 (simple=54 array=0 total=54)
+        M3_M2_CDNS_7558030484039 (simple=3 array=0 total=3)
+        viagen12_CDNS_7558030484040 (simple=8 array=0 total=8)
+        viagen12_CDNS_7558030484041 (simple=1 array=0 total=1)
+        viagen23_CDNS_7558030484042 (simple=1 array=0 total=1)
+        M3_M2_CDNS_7558030484044 (simple=4 array=0 total=4)
+        M3_M2_CDNS_7558030484045 (simple=2 array=0 total=2)
+        M2_M1_CDNS_7558030484046 (simple=5 array=0 total=5)
+        VIA_M1_Activ_db_0x02835b9b (simple=7 array=0 total=7)
+        M1_GatPoly_CDNS_7558030484048 (simple=3 array=0 total=3)
+    FLATTEN COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    FLATTENING SELECTED TOP LAYER CELL PLACEMENTS
+    PACKING GEOMETRY HEADERS
+    PACKING COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    FLATTENING SELECTED LAYERS
+    EXPANDING UNIQUE ICV PLACEMENTS
+    MERGING TOP/MP LAYER CELLS
+    EXPANDING LARGE TOP LAYER CELL PLACEMENTS
+    MERGING CURVILINEAR GEOMETRY
+    CURVILINEAR MERGE COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    COMPUTING RECTILINEAR EXTENTS
+    RECTILINEAR EXTENTS COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    SORTING PLACEMENTS VERTICALLY
+    SORT COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    ELIMINATING DUPLICATE PLACEMENTS
+    DUPLICATE PLACEMENT ELIMINATION COMPLETE (56024 -> 56024 = 0). CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    PACKING PLACEMENTS
+    PACKING COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    PACKING GEOMETRY HEADERS
+    PACKING COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    EXPANDING UNIQUE TRANSPARENT CELL PLACEMENTS
+      PRE-EXPAND COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+        bondpad in sg13g2_ip__bondpad_70x70 at (0,0)
+        lvsres_db_0x04007e9a in RSC_IHPSG13_CDLYX1_DUMMY at (0.805,3.42)
+    EXPAND COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    EXPANDING UNIQUE LIGHT-WEIGHT CELL PLACEMENTS
+      PRE-EXPAND COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+        sg13g2_GateLevelUpInv in sg13g2_IOPadOut30mA at (36.97,148.395)
+        lvsres_db_0x02834b9a in RM_IHPSG13_1P_BITKIT_CELL at (-0.5,-0.1)
+        viagen12_CDNS_7558030484029 in RM_IHPSG13_1P_BLDRV at (0.62,-0.4)
+        viagen12_CDNS_7558030484026 in RM_IHPSG13_1P_BLDRV at (0.125,8.405)
+        RSC_IHPSG13_NOR2X2 in RM_IHPSG13_1P_COLCTRL2 at (9.69,-25.5)
+        viagen23_CDNS_755803048408 in RM_IHPSG13_1P_COLCTRL2 at (8.71,-11.555)
+        RSC_IHPSG13_CBUFX2 in RM_IHPSG13_1P_COLCTRL2 at (8.67,-33.9)
+        RSC_IHPSG13_CINVX4_WN in RM_IHPSG13_1P_COLCTRL2 at (6.12,-25.5)
+        viagen12_CDNS_755803048400 in RM_IHPSG13_1P_COLCTRL2 at (5.26,-25.54)
+        RSC_IHPSG13_DFPQD_MSAFFX2N in RM_IHPSG13_1P_COLCTRL2 at (1.02,-33.9)
+        RSC_IHPSG13_TIEH in RM_IHPSG13_1P_COLCTRL2 at (0,-38.1)
+        RSC_IHPSG13_XOR2X2 in RM_IHPSG13_1P_CTRL at (24.99,-33.9)
+        RSC_IHPSG13_CDLYX2 in RM_IHPSG13_1P_CTRL at (4.59,-33.9)
+        RSC_IHPSG13_OA12X1 in RM_IHPSG13_1P_CTRL at (3.06,-29.7)
+        RSC_IHPSG13_CBUFX8 in RM_IHPSG13_1P_CTRL at (-4.59,-38.1)
+        RM_IHPSG13_1P_DEC_LE_l2wire in RM_IHPSG13_1P_ROWDEC8 at (0,8.4)
+        RSC_IHPSG13_MX2IX1 in RM_IHPSG13_1P_DLY_MUX at (-0.51,3.9)
+        RM_IHPSG13_1P_DLY_MUX in RM_IHPSG13_1P_1024x32_c2_bm_bist at (221.07,16.8)
+        RM_IHPSG13_1P_DLY_2 in RM_IHPSG13_1P_1024x32_c2_bm_bist at (201.18,21)
+        RM_IHPSG13_1P_DLY_4 in RM_IHPSG13_1P_1024x32_c2_bm_bist at (200.67,16.8)
+        sg13g2_io_inv_x1 in sg13g2_GateDecode at (5.38,0)
+        sg13g2_io_nand2_x1 in sg13g2_GateDecode at (3.6,0)
+        sg13g2_io_nor2_x1 in sg13g2_GateDecode at (1.2,0)
+        sg13g2_io_tie in sg13g2_GateDecode at (-0.25,0)
+        sg13g2_GateDecode in sg13g2_IOPadInOut30mA at (16.725,148.395)
+        sg13g2_nor3_1$1 in counter_top at (112.32,67.82)
+        sg13g2_nor4_2$1 in counter_top at (110.88,71.6)
+        sg13g2_nand2_2$1 in counter_top at (80.16,67.82)
+        sg13g2_nor2_1$1 in counter_top at (67.2,79.16)
+        sg13g2_nand4_1$1 in counter_top at (47.52,75.38)
+        sg13g2_buf_4$1 in counter_top at (46.08,67.82)
+        pmos in inverter at (0.35,5.76)
+        nmos in inverter at (0.35,1.5)
+        sg13g2_Clamp_N20N0D in sg13g2_IOPadAnalog at (0,6)
+        sg13g2_ip__jku_names in chip_top at (1445.95,1452.95)
+        sg13g2_inv_1 in chip_top at (860.64,906.98)
+        sg13g2_ip__jku in chip_top at (67.3,1443.7)
+    EXPAND COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    EXPANDING TRIVIAL CELL PLACEMENTS
+      PRE-EXPAND COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+        via_stack$13 (simple=2 array=0 total=2)
+    EXPAND COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    EXPANDING VERY SPARSE ARRAY PLACEMENTS
+    EXPANDING LARGE CELL ARRAY PLACEMENTS
+        RM_IHPSG13_1P_COLUMN_256 [32x1] in RM_IHPSG13_1P_MATRIX_256x64 at (-0.145,-1.41)
+    EXPAND COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    EXPANDING VERY SPARSE CELL PLACEMENTS
+      PRE-EXPAND COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+        sg13g2_RCClampResistor (simple=2 array=0 total=2)
+    EXPAND COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    EXPANDING VERY SPARSE CELL PLACEMENTS
+      PRE-EXPAND COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    ELIMINATING DUPLICATE SUPER-HIERARCHICAL PLACEMENTS
+    DUPLICATE SUPER-HIERARCHICAL PLACEMENT ELIMINATION COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    PROCESSING LAYOUT BLOAT LAYERS (auto-detected)
+    PROCESSING COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    PACKING GEOMETRY HEADERS
+    PACKING COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    PROCESSING LARGE CELL EXTENT-BLOATING LAYERS
+    PROCESSING COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    EXPANDING DENSE OVERLAPS
+      THRESHOLDS = 3423.95274509 34239.5274509 719766.796816
+      PRE-EXPAND COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+        sealring in chip_top at (0,0)
+        chip_top_logo in chip_top_logo_fill at (382,522)
+        chip_top in chip_top_logo_fill at (0,0)
+    EXPAND COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    EXPANDING DENSE OVERLAPS
+      THRESHOLDS = 1000 10000 288237.8513
+      PRE-EXPAND COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (174.075,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (168.455,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (162.835,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (157.215,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (151.595,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (145.975,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (140.355,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (134.735,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (129.115,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (123.495,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (117.875,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (112.255,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (106.635,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (101.015,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (95.395,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (89.775,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (84.155,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (78.535,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (72.915,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (67.295,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (61.675,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (56.055,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (50.435,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (44.815,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (39.195,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (33.575,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (27.955,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (22.335,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (16.715,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (11.095,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (5.475,-1.41)
+        RM_IHPSG13_1P_COLUMN_256 in RM_IHPSG13_1P_MATRIX_256x64 at (-0.145,-1.41)
+    EXPAND COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    EXPANDING DENSE OVERLAPS
+      THRESHOLDS = 1000 10000 288280.739737
+      PRE-EXPAND COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    EXPANDING UNIQUE META-CELL PLACEMENTS
+      PRE-EXPAND COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+        RM_IHPSG13_1P_ROWREG0 in RM_IHPSG13_1P_ROWREG8 at (-5.61,-12.9)
+        RM_IHPSG13_1P_ROWREG8 in RM_IHPSG13_1P_1024x32_c2_bm_bist at (188.43,33.6)
+    EXPAND COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    EXPANDING DENSE OVERLAPS
+      THRESHOLDS = 1000 10000 356311.961181
+      PRE-EXPAND COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    ANALYZING HIERARCHY FOR AUTOMATIC TURBO FLEX
+    ANALYSIS COMPLETE (TA=2560064.0004). CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/7/10
+    IDENTIFYING MULTI-CORE CELLS
+    INJECTING HIERARCHY
+      INJECTION PREP COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+        chip_top_logo_fill (bin BC=48 FBC=18 F=8 A=2560064.0004) FAUX BINS:
+            sg13g2_ip__bondpad_70x70 (4902.8004)
+            sg13g2_ip__bondpad_70x70 (4902.8004)
+            sg13g2_IOPadVss (14245.1604)
+            sg13g2_IOPadVdd (14245.1604)
+            sg13g2_IOPadIOVss (14245.1604)
+            sg13g2_IOPadIOVdd (14245.1604)
+            sg13g2_IOPadOut30mA (14405.2004)
+            sg13g2_IOPadOut30mA (14405.2004)
+            sg13g2_ip__bondpad_70x70 (4902.8004)
+            sg13g2_ip__bondpad_70x70 (4902.8004)
+            RM_IHPSG13_1P_1024x32_c2_bm_bist (140197.7568)
+            sg13g2_IOPadOut30mA (14405.2004)
+            sg13g2_IOPadOut30mA (14405.2004)
+            inverter_top (4441.148)
+            sg13g2_IOPadAnalog (14405.2004)
+            sg13g2_IOPadOut30mA (14405.2004)
+            sg13g2_ip__bondpad_70x70 (4902.8004)
+            sg13g2_ip__bondpad_70x70 (4902.8004)
+      BIN INJECTION COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+        RM_IHPSG13_1P_BITKIT_16x2_SRAM (priority4)
+        RM_IHPSG13_1P_COLCTRL2 (priority8)
+        RM_IHPSG13_1P_COLDRV13X4 (priority4)
+        RM_IHPSG13_1P_WLDRV16X4 (priority4)
+        RM_IHPSG13_1P_CTRL (priority8)
+        RM_IHPSG13_1P_DEC04 (priority8)
+        RM_IHPSG13_1P_DEC_LE_l1wire (priority4)
+        RM_IHPSG13_1P_BITKIT_16x2_EDGE_LR (priority4)
+        RM_IHPSG13_1P_COLDEC2 (priority4)
+        RM_IHPSG13_1P_DEC_LE_l0wire (priority4)
+        inverter (priority4)
+        chip_top_logo_fill(BIN19) (priority16)
+        chip_top_logo_fill(BIN20) (priority16)
+        RM_IHPSG13_1P_ROWDEC8 (priority4)
+        RM_IHPSG13_1P_1024x32_c2_bm_bist (priority4)
+        chip_top_logo_fill(BIN10) (priority16)
+        chip_top_logo_fill(BIN11) (priority16)
+        chip_top_logo_fill(BIN12) (priority16)
+        chip_top_logo_fill(BIN13) (priority16)
+        RM_IHPSG13_1P_MATRIX_256x64 (priority4)
+        counter_top (priority4)
+        chip_top_logo_fill(BIN26) (priority16)
+        chip_top_logo_fill(BIN27) (priority16+area6)
+        chip_top_logo_fill(BIN18) (priority16+area3)
+        chip_top_logo_fill(BIN28) (priority16+area7)
+        chip_top_logo_fill(BIN21) (priority16+area4)
+        chip_top_logo_fill(BIN29) (priority16+area7)
+      PRIORITY INJECTION COMPLETE CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+      INJECTION POST COMPLETE (29 0). CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    INJECTION COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    COMPUTING RECTANGULAR EXTENTS
+    RECTANGULAR EXTENTS COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    COMPUTING RECTILINEAR EXTENTS
+    RECTILINEAR EXTENTS COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    SORTING PLACEMENTS VERTICALLY
+    SORT COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    PUSHING VERY SMALL CELL PLACEMENTS
+    PUSHING TOP LAYER CELL PLACEMENTS
+    FLATTENING VERY SMALL CELL PLACEMENTS
+    FLATTENING SMALL TOP LAYER CELL PLACEMENTS
+    COMPUTING CELL-TO-WORLD TRANSFORMS
+    COMPUTE COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    SORTING PLACEMENTS BY CELL
+    SORT COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/7/10
+    PACKING HIERARCHY. (C=9 CN=1 P1=84 P2=1 P3=0 XF=0) LVHEAP = 4/7/10
+    PACKING COMPLETE. (C=8 CN=1 P=9 XF=0) CPU TIME = 0  REAL TIME = 0  LVHEAP = 2/7/10
+    COMPUTING PLACEMENT OVERLAPS
+    COMPUTE COMPLETE (OC=8433 V1=0 V2=0 SC=0 FC=8433). CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11
+    COMPUTING CELL OVERLAP AREAS
+    COMPUTE COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11
+    COMPUTING PLACEMENT / OVERLAP AREA INTERSECTIONS
+    COMPUTE COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11
+HIERARCHICAL DATABASE CONSTRUCTOR COMPLETE. CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11
+(C=8 CN=1 P=9 G=51 GH=17 D=0 TXT=0 XF=0 PO=7)
+
+--------------------------------------------------------------------------------
+-----                           VPC REQUIREMENTS                           -----
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-----               TEXT OBJECTS FOR CONNECTIVITY EXTRACTION               -----
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+-----                TEXT OBJECTS FOR WITH TEXT OPERATIONS                 -----
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+-----               TEXT OBJECTS FOR EXPAND TEXT OPERATIONS                -----
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+-----                  TEXT OBJECTS FOR CAPI OPERATIONS                    -----
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+-----             LAYER READ SUMMARY (SIMPLE LAYER GEOMETRIES)             -----
+--------------------------------------------------------------------------------
+SIMPLE LAYER      GEOMETRIES                                                    
+--------------------------------------------------------------------------------
+
+  0                      0
+  8                   2850
+  10                  2740
+  19                 16092
+  22                     0
+  29                 33957
+  30                  1622
+  39                    25
+  49                 17398
+  50                   416
+  66                 19675
+  67                  2361
+  125                18859
+  126                  323
+  133                11238
+  134                 4783
+
+--------------------------------------------------------------------------------
+-----            LAYER READ SUMMARY (ORIGINAL LAYER GEOMETRIES)            -----
+--------------------------------------------------------------------------------
+ORIGINAL LAYER       INITIAL GEOMETRIES                 FINAL GEOMETRIES        
+--------------------------------------------------------------------------------
+
+M1F                     2850 (1103948)                  51615 (1103948)         
+M1                      2850 (1103948)                  51615 (1103948)         
+M2F                     2740 (909662)                   94767 (909662)          
+M2                      2740 (909662)                   94767 (909662)          
+M3F                     1622 (403682)                   51925 (403682)          
+M3                      1622 (403682)                   51925 (403682)          
+M4F                      416 (71214)                    51181 (71214)           
+M4                       416 (71214)                    51181 (71214)           
+M5F                     2361 (61361)                    54569 (61361)           
+M5                      2361 (61361)                    54569 (61361)           
+TM1F                     323 (11029)                     8001 (11024)           
+TM1                      323 (11029)                     8001 (11024)           
+TM2F                    4783 (12527)                    10548 (12522)           
+TM2                     4783 (12527)                    10548 (12522)           
+EDGESEAL                  25 (25)                          25 (25)              
+V1                     16092 (418084)                   17126 (418084)          
+V2                     33957 (241791)                   34851 (241791)          
+V3                     17398 (170799)                   17411 (170799)          
+V4                     19675 (183408)                   19687 (183408)          
+TV1                    18859 (89796)                    22956 (89796)           
+TV2                    11238 (56585)                    11238 (56580)           
+
+--------------------------------------------------------------------------------
+-----         LAYER READ SUMMARY (TEXT FOR CONNECTIVITY EXTRACTION)        -----
+--------------------------------------------------------------------------------
+SIMPLE LAYER              TEXTS                                                 
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+-----          LAYER READ SUMMARY (TEXT FOR WITH TEXT OPERATIONS)          -----
+--------------------------------------------------------------------------------
+SIMPLE LAYER              TEXTS                                                 
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+-----         LAYER READ SUMMARY (TEXT FOR EXPAND TEXT OPERATIONS)         -----
+--------------------------------------------------------------------------------
+SIMPLE LAYER              TEXTS                                                 
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+-----            LAYER READ SUMMARY (TEXT FOR CAPI OPERATIONS)             -----
+--------------------------------------------------------------------------------
+SIMPLE LAYER              TEXTS                                                 
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-----               LAYOUT INPUT EXCEPTION SEVERITY SUMMARY                -----
+--------------------------------------------------------------------------------
+EXCEPTION                           SEVERITY  DEFAULT  COUNT        RDB         
+--------------------------------------------------------------------------------
+
+AREF_ANGLED                            0         Y       0         
+AREF_DIAGONAL                          0         Y       0         
+AREF_PLACEMENT                         0         Y       33386     
+AREF_UNPLACED                          0         Y       0         
+ARRAY_PITCH_ZERO                       0         Y       0         
+REPETITION_TYPE_8_9_10_11              0         Y       0         
+DUPLICATE_CELL                         2         Y       0         
+EXCLUDE_CELL_NAME                      1         Y       0         
+EXPAND_CELL                            1         Y       0         
+EXTENT_CELL                            1         Y       0         
+INSIDE_CELL                            1         Y       0         
+MISSING_REFERENCE                      2         Y       0         
+RENAME_CELL                            0         Y       0         
+TOP_CELL_CHOSEN                        1         Y       0         
+TOP_CELL_MULTIPLE                      0         Y       0         
+LAYER_DIRECTORY                        2         Y       0         
+DATATYPE_MAP_SOURCE                    1         Y       0         
+DATATYPE_MAP_TARGET                    1         Y       0         
+EMPTY_BASE_LAYER                       1         Y       0         
+EMPTY_LAYER                            1         Y       2         
+LAYER_OVER_BUMP                        1         Y       0         
+LAYER_BUMP_DUPLICATE                   0         Y       0         
+UNUSED_DATA                            1         Y       24        
+MAGNIFICATION_AUTO                     0         Y       0         
+BOX_RECORD                             0         Y       285       
+CIRCLE                                 2         Y       0         
+CIRCLE_RADIUS_ZERO                     1         Y       0         
+CTRAPEZOID_AREA_ZERO                   1         Y       0         
+CTRAPEZOID_DEGENERATE                  2         Y       0         
+TRAPEZOID_AREA_ZERO                    1         Y       0         
+TRAPEZOID_DEGENERATE                   2         Y       0         
+XGEOMETRY_UNSUPPORTED                  2         Y       0         
+NODE_RECORD                            0         Y       285       
+XELEMENT_UNSUPPORTED                   2         Y       0         
+XNAME_UNSUPPORTED                      2         Y       0         
+END_RECORD_BEFORE_END_OF_FILE          0         Y       0         
+PATH_ACUTE                             1         Y       3908      
+PATH_ANGLED                            1         Y       3908      
+PATH_SKEW                              1         Y       3908      
+PATH_BIG                               0         Y       0         
+PATH_CIRCULAR                          1         Y       0         
+PATH_COINCIDENT                        1         Y       3908      
+PATH_DEGENERATE                        2         Y       0         
+PATH_ENDSEGMENT_SHORT                  1         Y       0         
+PATH_EXTENSION                         2         Y       271       
+PATH_EXTENSION_MULTIPLE                1         Y       0         
+PATH_NEGATIVE                          1         Y       0         
+PATH_NONORIENTABLE                     2         Y       0         
+PATH_NONSIMPLE                         0         Y       0         
+PATH_SPIKE                             2         Y       0         
+PATH_VARIABLE                          1         Y       271       
+PATH_WIDTH_ABSOLUTE                    2         Y       0         
+PATH_WIDTH_MULTIPLE                    1         Y       0         
+PATH_WIDTH_ODD                         0         Y       0         
+PATH_WIDTH_ZERO                        1         Y       0         
+LAYOUT_PATH_LAYER_GDS                  1         Y       0         
+PLACEMENT_ANGLE_ABSOLUTE               2         Y       0         
+PLACEMENT_MAGNIFICATION_ABSOLUTE       2         Y       0         
+PLACEMENT_MAGNIFICATION_NONPOSITIVE    2         Y       0         
+PLACEMENT_MAGNIFIED                    0         Y       0         
+PLACEMENT_MULTIPLE                     0         Y       0         
+LAYOUT_POLYGON                         1         Y       0         
+POLYGON_ACUTE                          0         Y       0         
+POLYGON_AREA_ZERO                      1         Y       0         
+POLYGON_DEGENERATE                     2         Y       0         
+POLYGON_IS_RECTANGLE                   0         Y       0         
+POLYGON_NONORIENTABLE                  2         Y       0         
+POLYGON_NONSIMPLE                      0         Y       0         
+POLYGON_NOT_CLOSED                     0         Y       0         
+POLYGON_SPIKE                          0         Y       0         
+RECTANGLE_SIDE_ZERO                    1         Y       0         
+CELLNAME_NSTRING                       2         Y       0         
+PROPNAME_NSTRING                       2         Y       0         
+TEXT_LENGTH                            1         Y       0         
+TEXTSTRING_ASTRING                     2         Y       0         
+LAYOUT_TEXT                            1         Y       0         
+TEXT_BIG                               2         Y       0         
+TEXT_DEGENERATE                        2         Y       0         
+METRIC_INPUT_FILE                      2         Y       0         
+METRIC_RULE_FILE                       1         Y       0         
+PRECISION_LAYOUT                       2         Y       0         
+PRECISION_INPUT_FILE                   2         Y       0         
+PRECISION_RULE_FILE                    2         Y       0         
+
+
+--------------------------------------------------------------------------------
+-----                      CELL AND PLACEMENT SUMMARY                      -----
+--------------------------------------------------------------------------------
+CELL TYPE                 CELLS           PLACEMENTS       FLAT PLACEMENTS      
+--------------------------------------------------------------------------------
+
+USER                        170                 4374                261014
+ VERY SMALL                   0                    0                     0
+ TOP LAYER                    0                    0                     0
+  VERY SMALL                  0                    0                     0
+PSEUDO                      321                 4315                 60611
+TOTAL                       491                 8689                321625
+
+--------------------------------------------------------------------------------
+-----                   LAYOUT DATA INPUT MODULE SUMMARY                   -----
+--------------------------------------------------------------------------------
+
+--- TOTAL GEOMETRIES READ FROM SIMPLE LAYERS = 132339
+--- TOTAL GEOMETRIES READ FROM ORIGINAL LAYERS = 147434 (6307334)
+--- TOTAL GEOMETRIES WRITTEN TO ORIGINAL LAYERS = 768506 (6307309)
+--- LVHEAP = 3/11/11
+--- DATABASE EXTENT = [ 0 , 0 ] -> [ 1600 , 1600 ]
+--- GEOMETRIC DEPTH = ALL
+--- TEXT DEPTH FOR CONNECTIVITY EXTRACTION = PRIMARY
+--- TOTAL TEXT OBJECTS FOR CONNECTIVITY EXTRACTION = 0 (0)
+--- TOTAL TEXT OBJECTS FOR WITH TEXT OPERATIONS = 0 (0)
+--- TOTAL TEXT OBJECTS FOR EXPAND TEXT OPERATIONS = 0 (0)
+--- TOTAL TEXT OBJECTS FOR CAPI OPERATIONS = 0 (0)
+--- GEOMETRY FLAGGING = ACUTE (NO)  SKEW (NO)  ANGLED (NO)  OFFGRID (NO)
+                        NONSIMPLE POLYGON (NO)  NONSIMPLE PATH (NO)
+--- PRIMARY CELL = chip_top_logo_fill
+--- EXCLUDED CELLS =
+--- LAYOUT BASE LAYER = (NOT SPECIFIED)
+--- LAYOUT TOP LAYER = (NOT SPECIFIED)
+--- LAYOUT IGNORE LAYER [INVERSE] = (NOT SPECIFIED)
+
+--- CALIBRE LAYOUT DATA INPUT MODULE COMPLETED.  CPU TIME = 0  REAL TIME = 0
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-----        CALIBRE::DRC-H - RESULTS DATABASE INITIALIZATION MODULE       -----
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+--- GLOBAL DRC RESULTS DATABASE FILE = calibre_drc.db (ASCII)
+--- GLOBAL MAXIMUM RESULTS PER RULECHECK = 100000
+--- GLOBAL MAXIMUM VERTICES PER RESULT POLYGON = 4096
+--- CHECK TEXT MAPPING = COMMENTS + RULE FILE INFORMATION
+--- KEEP EMPTY RULE CHECKS = YES
+--- DRC RESULTS MAGNIFICATION = 1
+--- DRC RESULTS DATABASE PRECISION = 1000
+
+--------------------------------------------------------------------------------
+-----              DRC RULECHECK -> RESULTS DATABASE MAPPING               -----
+--------------------------------------------------------------------------------
+                                                          DATA        MAX    MAX
+RULECHECK            RESULTS DATABASE         TYPE LAYER  TYPE     RESULT VERTEX
+--------------------------------------------------------------------------------
+M1_a                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+M1_b                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+M2_a                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+M2_b                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+M3_a                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+M3_b                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+M4_a                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+M4_b                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+M5_a                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+M5_b                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V1_a_w               calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V1_a_A               calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V1_b                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V1_c                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V2_a_w               calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V2_a_A               calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V2_b                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V2_c                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V3_a_w               calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V3_a_A               calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V3_b                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V3_c                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V4_a_w               calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V4_a_A               calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V4_b                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+V4_c                 calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TV1_a_w              calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TV1_a_A              calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TV1_b                calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TV1_c                calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TV1_d                calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TV2_a_w              calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TV2_a_A              calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TV2_b                calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TV2_c                calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TV2_d                calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TM1_a                calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TM1_b                calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TM2_a                calibre_drc.db          ASCII   N/A   N/A     100000   4096
+TM2_b                calibre_drc.db          ASCII   N/A   N/A     100000   4096
+
+--- CALIBRE::DRC-H RESULTS DATABASE INITIALIZATION MODULE COMPLETED.  CPU TIME = 0  REAL TIME = 0
+
+--- CALIBRE::DRC-H LAYER READ SUMMARY SETUP COMPLETED.  CPU TIME = 0  REAL TIME = 0
+
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+-----                   CALIBRE::DRC-H - EXECUTIVE MODULE                  -----
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+M1 = OR M1
+----------
+M1 (HIER TYP=1 CFG=1 HGC=52024 FGC=582574 HEC=214579 FEC=3804548 IGC=10567 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 1 OF 74  ELAPSED TIME = 2
+
+Original Layer M1 DELETED -- LVHEAP = 3/11/11
+
+M1_a::<1> = INT M1 < 0.16
+-------------------------
+M1_a::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 2 OF 74  ELAPSED TIME = 3
+
+Layer M1_a::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck M1_a COMPLETED. Number of Results = 0 (0)
+
+M1F = OR M1F
+------------
+M1F (HIER TYP=1 CFG=1 HGC=52024 FGC=582574 HEC=214579 FEC=3804548 IGC=10567 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/11/11  OPS COMPLETE = 3 OF 74  ELAPSED TIME = 3
+
+Original Layer M1F DELETED -- LVHEAP = 4/11/11
+
+M1DF = M1 OR M1F
+----------------
+M1DF (HIER TYP=1 CFG=1 HGC=52024 FGC=582574 HEC=214579 FEC=3804548 IGC=10567 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/11/11  OPS COMPLETE = 4 OF 74  ELAPSED TIME = 3
+
+Layer M1F DELETED -- LVHEAP = 4/11/11
+
+M1_b::<1> = EXT M1DF < 0.18
+---------------------------
+M1_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 5 OF 74  ELAPSED TIME = 3
+
+Layer M1DF DELETED -- LVHEAP = 3/11/11
+
+Layer M1_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck M1_b COMPLETED. Number of Results = 0 (0)
+
+M2 = OR M2
+----------
+M2 (HIER TYP=1 CFG=1 HGC=94889 FGC=700855 HEC=383573 FEC=2829922 IGC=12087 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 6 OF 74  ELAPSED TIME = 3
+
+Original Layer M2 DELETED -- LVHEAP = 3/11/11
+
+M2_a::<1> = INT M2 < 0.2
+------------------------
+M2_a::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 7 OF 74  ELAPSED TIME = 4
+
+Layer M2_a::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck M2_a COMPLETED. Number of Results = 0 (0)
+
+M2F = OR M2F
+------------
+M2F (HIER TYP=1 CFG=1 HGC=94889 FGC=700855 HEC=383573 FEC=2829922 IGC=12087 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/11/11  OPS COMPLETE = 8 OF 74  ELAPSED TIME = 4
+
+Original Layer M2F DELETED -- LVHEAP = 4/11/11
+
+M2DF = M2 OR M2F
+----------------
+M2DF (HIER TYP=1 CFG=1 HGC=94889 FGC=700855 HEC=383573 FEC=2829922 IGC=12087 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/11/11  OPS COMPLETE = 9 OF 74  ELAPSED TIME = 4
+
+Layer M2F DELETED -- LVHEAP = 4/11/11
+
+M2_b::<1> = EXT M2DF < 0.21
+---------------------------
+M2_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 10 OF 74  ELAPSED TIME = 4
+
+Layer M2DF DELETED -- LVHEAP = 3/11/11
+
+Layer M2_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck M2_b COMPLETED. Number of Results = 0 (0)
+
+M3 = OR M3
+----------
+M3 (HIER TYP=1 CFG=1 HGC=52140 FGC=196531 HEC=210374 FEC=797583 IGC=7735 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 11 OF 74  ELAPSED TIME = 4
+
+Original Layer M3 DELETED -- LVHEAP = 3/11/11
+
+M3_a::<1> = INT M3 < 0.2
+------------------------
+M3_a::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 12 OF 74  ELAPSED TIME = 4
+
+Layer M3_a::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck M3_a COMPLETED. Number of Results = 0 (0)
+
+M3F = OR M3F
+------------
+M3F (HIER TYP=1 CFG=1 HGC=52140 FGC=196531 HEC=210374 FEC=797583 IGC=7735 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 13 OF 74  ELAPSED TIME = 4
+
+Original Layer M3F DELETED -- LVHEAP = 3/11/11
+
+M3DF = M3 OR M3F
+----------------
+M3DF (HIER TYP=1 CFG=1 HGC=52140 FGC=196531 HEC=210374 FEC=797583 IGC=7735 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 14 OF 74  ELAPSED TIME = 4
+
+Layer M3F DELETED -- LVHEAP = 3/11/11
+
+M3_b::<1> = EXT M3DF < 0.21
+---------------------------
+M3_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 15 OF 74  ELAPSED TIME = 4
+
+Layer M3DF DELETED -- LVHEAP = 3/11/11
+
+Layer M3_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck M3_b COMPLETED. Number of Results = 0 (0)
+
+M4 = OR M4
+----------
+M4 (HIER TYP=1 CFG=1 HGC=52106 FGC=71100 HEC=208611 FEC=285018 IGC=8024 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 16 OF 74  ELAPSED TIME = 4
+
+Original Layer M4 DELETED -- LVHEAP = 3/11/11
+
+M4_a::<1> = INT M4 < 0.2
+------------------------
+M4_a::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 17 OF 74  ELAPSED TIME = 4
+
+Layer M4_a::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck M4_a COMPLETED. Number of Results = 0 (0)
+
+M4F = OR M4F
+------------
+M4F (HIER TYP=1 CFG=1 HGC=52106 FGC=71100 HEC=208611 FEC=285018 IGC=8024 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 18 OF 74  ELAPSED TIME = 4
+
+Original Layer M4F DELETED -- LVHEAP = 3/11/11
+
+M4DF = M4 OR M4F
+----------------
+M4DF (HIER TYP=1 CFG=1 HGC=52106 FGC=71100 HEC=208611 FEC=285018 IGC=8024 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 19 OF 74  ELAPSED TIME = 4
+
+Layer M4F DELETED -- LVHEAP = 3/11/11
+
+M4_b::<1> = EXT M4DF < 0.21
+---------------------------
+M4_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 20 OF 74  ELAPSED TIME = 4
+
+Layer M4DF DELETED -- LVHEAP = 3/11/11
+
+Layer M4_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck M4_b COMPLETED. Number of Results = 0 (0)
+
+M5 = OR M5
+----------
+M5 (HIER TYP=1 CFG=1 HGC=53486 FGC=59158 HEC=219104 FEC=242031 IGC=7900 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 21 OF 74  ELAPSED TIME = 4
+
+Original Layer M5 DELETED -- LVHEAP = 3/11/11
+
+M5_a::<1> = INT M5 < 0.2
+------------------------
+M5_a::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 22 OF 74  ELAPSED TIME = 4
+
+Layer M5_a::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck M5_a COMPLETED. Number of Results = 0 (0)
+
+M5F = OR M5F
+------------
+M5F (HIER TYP=1 CFG=1 HGC=53486 FGC=59158 HEC=219104 FEC=242031 IGC=7900 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/11/11  OPS COMPLETE = 23 OF 74  ELAPSED TIME = 4
+
+Original Layer M5F DELETED -- LVHEAP = 4/11/11
+
+M5DF = M5 OR M5F
+----------------
+M5DF (HIER TYP=1 CFG=1 HGC=53486 FGC=59158 HEC=219104 FEC=242031 IGC=7900 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/11/11  OPS COMPLETE = 24 OF 74  ELAPSED TIME = 4
+
+Layer M5F DELETED -- LVHEAP = 4/11/11
+
+M5_b::<1> = EXT M5DF < 0.21
+---------------------------
+M5_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 25 OF 74  ELAPSED TIME = 4
+
+Layer M5DF DELETED -- LVHEAP = 3/11/11
+
+Layer M5_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck M5_b COMPLETED. Number of Results = 0 (0)
+
+V1 = OR V1
+----------
+V1 (HIER TYP=1 CFG=1 HGC=17141 FGC=418084 HEC=68636 FEC=1672408 IGC=10119 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 26 OF 74  ELAPSED TIME = 4
+
+Original Layer V1 DELETED -- LVHEAP = 3/11/11
+
+EDGESEAL = OR EDGESEAL
+----------------------
+EDGESEAL (HIER-LSL TYP=1 CFG=0 HGC=425 FGC=283519 HEC=5164 FEC=1179294 IGC=2898 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 4/11/11  OPS COMPLETE = 27 OF 74  ELAPSED TIME = 4
+
+Original Layer EDGESEAL DELETED -- LVHEAP = 4/11/11
+
+V1NS = V1 NOT EDGESEAL
+----------------------
+V1NS (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 28 OF 74  ELAPSED TIME = 4
+
+Layer V1 DELETED -- LVHEAP = 3/11/11
+
+V1_b::<1> = EXT V1NS < 0.22
+V1_a_w::<1> = INT V1NS < 0.19
+-----------------------------
+V1_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+V1_a_w::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 30 OF 74  ELAPSED TIME = 4
+
+Layer V1_a_w::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V1_a_w COMPLETED. Number of Results = 0 (0)
+
+V1_a_A::<1> = AREA V1NS > 0.0361
+--------------------------------
+V1_a_A::<1> (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 31 OF 74  ELAPSED TIME = 4
+
+Layer V1_a_A::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V1_a_A COMPLETED. Number of Results = 0 (0)
+
+Layer V1_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V1_b COMPLETED. Number of Results = 0 (0)
+
+V1_c::<1> = ENC V1NS M1 < 0.01
+------------------------------
+V1_c::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 32 OF 74  ELAPSED TIME = 4
+
+Layer V1NS DELETED -- LVHEAP = 3/11/11
+
+Layer M1 DELETED -- LVHEAP = 3/11/11
+
+Layer V1_c::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V1_c COMPLETED. Number of Results = 0 (0)
+
+V2 = OR V2
+----------
+V2 (HIER TYP=1 CFG=1 HGC=34867 FGC=241807 HEC=139540 FEC=967300 IGC=10694 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 33 OF 74  ELAPSED TIME = 4
+
+Original Layer V2 DELETED -- LVHEAP = 3/11/11
+
+V2NS = V2 NOT EDGESEAL
+----------------------
+V2NS (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 34 OF 74  ELAPSED TIME = 4
+
+Layer V2 DELETED -- LVHEAP = 3/11/11
+
+V2_b::<1> = EXT V2NS < 0.22
+V2_a_w::<1> = INT V2NS < 0.19
+-----------------------------
+V2_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+V2_a_w::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 36 OF 74  ELAPSED TIME = 4
+
+Layer V2_a_w::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V2_a_w COMPLETED. Number of Results = 0 (0)
+
+V2_a_A::<1> = AREA V2NS > 0.0361
+--------------------------------
+V2_a_A::<1> (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 37 OF 74  ELAPSED TIME = 4
+
+Layer V2_a_A::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V2_a_A COMPLETED. Number of Results = 0 (0)
+
+Layer V2_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V2_b COMPLETED. Number of Results = 0 (0)
+
+V2_c::<1> = ENC V2NS M2 < 0.005
+-------------------------------
+V2_c::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 38 OF 74  ELAPSED TIME = 4
+
+Layer V2NS DELETED -- LVHEAP = 3/11/11
+
+Layer M2 DELETED -- LVHEAP = 3/11/11
+
+Layer V2_c::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V2_c COMPLETED. Number of Results = 0 (0)
+
+V3 = OR V3
+----------
+V3 (HIER TYP=1 CFG=1 HGC=17427 FGC=170815 HEC=69780 FEC=683332 IGC=7825 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 39 OF 74  ELAPSED TIME = 4
+
+Original Layer V3 DELETED -- LVHEAP = 3/11/11
+
+V3NS = V3 NOT EDGESEAL
+----------------------
+V3NS (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 40 OF 74  ELAPSED TIME = 4
+
+Layer V3 DELETED -- LVHEAP = 3/11/11
+
+V3_b::<1> = EXT V3NS < 0.22
+V3_a_w::<1> = INT V3NS < 0.19
+-----------------------------
+V3_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+V3_a_w::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 42 OF 74  ELAPSED TIME = 4
+
+Layer V3_a_w::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V3_a_w COMPLETED. Number of Results = 0 (0)
+
+V3_a_A::<1> = AREA V3NS > 0.0361
+--------------------------------
+V3_a_A::<1> (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 43 OF 74  ELAPSED TIME = 4
+
+Layer V3_a_A::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V3_a_A COMPLETED. Number of Results = 0 (0)
+
+Layer V3_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V3_b COMPLETED. Number of Results = 0 (0)
+
+V3_c::<1> = ENC V3NS M3 < 0.005
+-------------------------------
+V3_c::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 44 OF 74  ELAPSED TIME = 4
+
+Layer V3NS DELETED -- LVHEAP = 3/11/11
+
+Layer M3 DELETED -- LVHEAP = 3/11/11
+
+Layer V3_c::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V3_c COMPLETED. Number of Results = 0 (0)
+
+V4 = OR V4
+----------
+V4 (HIER TYP=1 CFG=1 HGC=19703 FGC=183424 HEC=78884 FEC=733768 IGC=87378 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 45 OF 74  ELAPSED TIME = 5
+
+Original Layer V4 DELETED -- LVHEAP = 3/11/11
+
+V4NS = V4 NOT EDGESEAL
+----------------------
+V4NS (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 46 OF 74  ELAPSED TIME = 5
+
+Layer V4 DELETED -- LVHEAP = 3/11/11
+
+V4_b::<1> = EXT V4NS < 0.22
+V4_a_w::<1> = INT V4NS < 0.19
+-----------------------------
+V4_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+V4_a_w::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 48 OF 74  ELAPSED TIME = 5
+
+Layer V4_a_w::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V4_a_w COMPLETED. Number of Results = 0 (0)
+
+V4_a_A::<1> = AREA V4NS > 0.0361
+--------------------------------
+V4_a_A::<1> (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 49 OF 74  ELAPSED TIME = 5
+
+Layer V4_a_A::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V4_a_A COMPLETED. Number of Results = 0 (0)
+
+Layer V4_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V4_b COMPLETED. Number of Results = 0 (0)
+
+V4_c::<1> = ENC V4NS M4 < 0.005
+-------------------------------
+V4_c::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 50 OF 74  ELAPSED TIME = 5
+
+Layer V4NS DELETED -- LVHEAP = 3/11/11
+
+Layer M4 DELETED -- LVHEAP = 3/11/11
+
+Layer V4_c::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck V4_c COMPLETED. Number of Results = 0 (0)
+
+TV1 = OR TV1
+------------
+TV1 (HIER TYP=1 CFG=1 HGC=22972 FGC=89812 HEC=91960 FEC=359320 IGC=10066 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 51 OF 74  ELAPSED TIME = 5
+
+Original Layer TV1 DELETED -- LVHEAP = 3/11/11
+
+TV1NS = TV1 NOT EDGESEAL
+------------------------
+TV1NS (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 52 OF 74  ELAPSED TIME = 5
+
+Layer TV1 DELETED -- LVHEAP = 3/11/11
+
+TV1_b::<1> = EXT TV1NS < 0.42
+TV1_a_w::<1> = INT TV1NS < 0.42
+-------------------------------
+TV1_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+TV1_a_w::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 54 OF 74  ELAPSED TIME = 5
+
+Layer TV1_a_w::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TV1_a_w COMPLETED. Number of Results = 0 (0)
+
+TV1_a_A::<1> = AREA TV1NS > 0.1764
+----------------------------------
+TV1_a_A::<1> (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 55 OF 74  ELAPSED TIME = 5
+
+Layer TV1_a_A::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TV1_a_A COMPLETED. Number of Results = 0 (0)
+
+Layer TV1_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TV1_b COMPLETED. Number of Results = 0 (0)
+
+TV1_c::<1> = ENC TV1NS M5 < 0.1
+-------------------------------
+TV1_c::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 56 OF 74  ELAPSED TIME = 5
+
+Layer M5 DELETED -- LVHEAP = 3/11/11
+
+Layer TV1_c::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TV1_c COMPLETED. Number of Results = 0 (0)
+
+TM1 = OR TM1
+------------
+TM1 (HIER TYP=1 CFG=1 HGC=7549 FGC=235601 HEC=42246 FEC=992800 IGC=2790 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 57 OF 74  ELAPSED TIME = 5
+
+Original Layer TM1 DELETED -- LVHEAP = 3/11/11
+
+TV1_d::<1> = ENC TV1NS TM1 < 0.42
+---------------------------------
+TV1_d::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 58 OF 74  ELAPSED TIME = 5
+
+Layer TV1NS DELETED -- LVHEAP = 3/11/11
+
+Layer TV1_d::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TV1_d COMPLETED. Number of Results = 0 (0)
+
+TV2 = OR TV2
+------------
+TV2 (HIER TYP=1 CFG=1 HGC=11254 FGC=56596 HEC=45088 FEC=226456 IGC=3082 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 59 OF 74  ELAPSED TIME = 5
+
+Original Layer TV2 DELETED -- LVHEAP = 3/11/11
+
+TV2NS = TV2 NOT EDGESEAL
+------------------------
+TV2NS (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 60 OF 74  ELAPSED TIME = 5
+
+Layer TV2 DELETED -- LVHEAP = 3/11/11
+
+Layer EDGESEAL DELETED -- LVHEAP = 3/11/11
+
+TV2_b::<1> = EXT TV2NS < 1.06
+TV2_a_w::<1> = INT TV2NS < 0.9
+------------------------------
+TV2_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+TV2_a_w::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 62 OF 74  ELAPSED TIME = 5
+
+Layer TV2_a_w::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TV2_a_w COMPLETED. Number of Results = 0 (0)
+
+TV2_a_A::<1> = AREA TV2NS > 0.81
+--------------------------------
+TV2_a_A::<1> (HIER TYP=1 CFG=1 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 63 OF 74  ELAPSED TIME = 5
+
+Layer TV2_a_A::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TV2_a_A COMPLETED. Number of Results = 0 (0)
+
+Layer TV2_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TV2_b COMPLETED. Number of Results = 0 (0)
+
+TV2_c::<1> = ENC TV2NS TM1 < 0.5
+--------------------------------
+TV2_c::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 64 OF 74  ELAPSED TIME = 5
+
+Layer TV2_c::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TV2_c COMPLETED. Number of Results = 0 (0)
+
+TM2 = OR TM2
+------------
+TM2 (HIER TYP=1 CFG=1 HGC=7308 FGC=232059 HEC=40657 FEC=980168 IGC=2300 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 65 OF 74  ELAPSED TIME = 5
+
+Original Layer TM2 DELETED -- LVHEAP = 3/11/11
+
+TV2_d::<1> = ENC TV2NS TM2 < 0.5
+--------------------------------
+TV2_d::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 66 OF 74  ELAPSED TIME = 5
+
+Layer TV2NS DELETED -- LVHEAP = 3/11/11
+
+Layer TV2_d::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TV2_d COMPLETED. Number of Results = 0 (0)
+
+TM1_a::<1> = INT TM1 < 1.64
+---------------------------
+TM1_a::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 67 OF 74  ELAPSED TIME = 5
+
+Layer TM1_a::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TM1_a COMPLETED. Number of Results = 0 (0)
+
+TM1F = OR TM1F
+--------------
+TM1F (HIER TYP=1 CFG=1 HGC=7549 FGC=235601 HEC=42246 FEC=992800 IGC=2790 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 68 OF 74  ELAPSED TIME = 5
+
+Original Layer TM1F DELETED -- LVHEAP = 3/11/11
+
+TM1DF = TM1 OR TM1F
+-------------------
+TM1DF (HIER TYP=1 CFG=1 HGC=7549 FGC=235601 HEC=42246 FEC=992800 IGC=2790 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 69 OF 74  ELAPSED TIME = 5
+
+Layer TM1 DELETED -- LVHEAP = 3/11/11
+
+Layer TM1F DELETED -- LVHEAP = 3/11/11
+
+TM1_b::<1> = EXT TM1DF < 1.64
+-----------------------------
+TM1_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 70 OF 74  ELAPSED TIME = 5
+
+Layer TM1DF DELETED -- LVHEAP = 3/11/11
+
+Layer TM1_b::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TM1_b COMPLETED. Number of Results = 0 (0)
+
+TM2_a::<1> = INT TM2 < 2
+------------------------
+TM2_a::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 71 OF 74  ELAPSED TIME = 5
+
+Layer TM2_a::<1> DELETED -- LVHEAP = 3/11/11
+
+DRC RuleCheck TM2_a COMPLETED. Number of Results = 0 (0)
+
+TM2F = OR TM2F
+--------------
+TM2F (HIER TYP=1 CFG=1 HGC=7308 FGC=232059 HEC=40657 FEC=980168 IGC=2300 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 72 OF 74  ELAPSED TIME = 5
+
+Original Layer TM2F DELETED -- LVHEAP = 3/11/11
+
+TM2DF = TM2 OR TM2F
+-------------------
+TM2DF (HIER TYP=1 CFG=1 HGC=7308 FGC=232059 HEC=40657 FEC=980168 IGC=2300 VHC=F VPC=F)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 73 OF 74  ELAPSED TIME = 5
+
+Layer TM2 DELETED -- LVHEAP = 3/11/11
+
+Layer TM2F DELETED -- LVHEAP = 3/11/11
+
+TM2_b::<1> = EXT TM2DF < 2
+--------------------------
+TM2_b::<1> (HIER TYP=3 CFG=0 HGC=0 FGC=0 HEC=0 FEC=0 IGC=0)
+CPU TIME = 0  REAL TIME = 0  LVHEAP = 3/11/11  OPS COMPLETE = 74 OF 74  ELAPSED TIME = 5
+
+Layer TM2DF DELETED -- LVHEAP = 3/11/11
+
+Layer TM2_b::<1> DELETED -- LVHEAP = 3/11/11
+
+WRITE to ASCII DRC Results Database calibre_drc.db COMPLETED
+
+DRC RuleCheck TM2_b COMPLETED. Number of Results = 0 (0)
+
+Cumulative ONE-LAYER BOOLEAN Time: CPU = 1  REAL = 1
+Cumulative TWO-LAYER BOOLEAN Time: CPU = 0  REAL = 0
+Cumulative POLYGON MEASUREMENT Time: CPU = 0  REAL = 0
+Cumulative ONE-LAYER DRC Time: CPU = 1  REAL = 1
+Cumulative TWO-LAYER DRC Time: CPU = 0  REAL = 0
+Cumulative RDB Time: CPU = 0  REAL = 0
+
+--- CALIBRE::DRC-H EXECUTIVE MODULE COMPLETED.  CPU TIME = 2  REAL TIME = 2
+--- TOTAL RULECHECKS EXECUTED = 40
+--- TOTAL RESULTS GENERATED = 0 (0)
+--- TOTAL NAR RDB RESULTS GENERATED = 0
+--- TOTAL DENSITY RDB RESULTS GENERATED = 0
+--- DRC RESULTS DATABASE FILE = calibre_drc.db (ASCII)
+
+--- CALIBRE::DRC-H COMPLETED - Wed Aug 26 02:34:09 2026
+--- TOTAL CPU TIME = 3  REAL TIME = 4
+--- PROCESSOR COUNT = 1
+--- SUMMARY REPORT FILE = calibre_drc.summary
+

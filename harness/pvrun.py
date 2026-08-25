@@ -64,7 +64,7 @@ RULECHECK_RE = re.compile(
 # pure helpers (exercised by --self-test)
 def rule_names_from_deck(deck_text: str) -> list[str]:
     """Ordered list of check names from brace-named RuleCheck statements:
-    Name { WIDTH|EXT|ENC ... } — verified SVRF dialect of Calibre 2026.3."""
+    Name { INT|EXT|ENC|AREA ... } — verified SVRF dialect of Calibre 2026.3."""
     names = []
     for m in re.finditer(
             r"(?m)^([A-Za-z][A-Za-z0-9_]*)\s*\{\s*"
@@ -73,6 +73,7 @@ def rule_names_from_deck(deck_text: str) -> list[str]:
         name = m.group(1)
         if name not in names:
             names.append(name)
+    return names
 
 
 def expand_runset(template_text: str, **tokens: str) -> str:
@@ -80,6 +81,7 @@ def expand_runset(template_text: str, **tokens: str) -> str:
     out = template_text
     for key, val in tokens.items():
         out = out.replace(f"@{key.upper()}@", val)
+    leftover = re.findall(r"@[A-Z_]+@", out)
     if leftover:
         raise StageError("expand:runset", f"unexpanded tokens: {leftover}")
     return out
@@ -117,25 +119,34 @@ def parse_magic_count(text: str) -> int | None:
 
 
 def build_runner_script(candidates: list[str]) -> str:
-    """POSIX sh script: try each license env until calibre completes without
-    a license failure; record winner + rc for host-side polling."""
+    """POSIX sh script: try each license env until calibre completes.
+    rc.txt values: "0" = success; "deck:<rc>" = non-license (deck/layout)
+                   failure, abort immediately; "no-license" = all envs failed.
+    License-failure signature is matched against the log so deck errors are
+    never misclassified as license problems."""
     cand_lines = "\n".join(f'  "{c}" \\' for c in candidates).rstrip(" \\")
     return f"""#!/bin/sh
 cd "$HOME/{VM_RUNDIR}" || exit 97
 CANDIDATES=(
 {cand_lines}
 )
+LIC_RE='unable to acquire|unable to (find|check out).*licen|licen[sc]e.*(denied|fail)|no license file variables'
 for CAND in "${{CANDIDATES[@]}}"; do
   : > calibre.log
   export "$CAND"
   {CALIBRE_BIN} -drc -hier sg13g2_beol_gen.drc >> calibre.log 2>&1
   RC=$?
-  if [ "$RC" -eq 0 ] && ! grep -qiE 'unable to (find|check out).*licen|licen[s c]*.*(fail|denied)' calibre.log; then
+  if [ "$RC" -eq 0 ]; then
     echo "$CAND" > license_var.txt
-    echo "$RC" > rc.txt
+    echo "0" > rc.txt
     exit 0
   fi
   echo "$CAND rc=$RC" >> license_attempts.log
+  if ! grep -qiE "$LIC_RE" calibre.log; then
+    echo "deck:$RC" > rc.txt          # real deck/layout error — stop trying
+    echo "$CAND" > license_var.txt
+    exit 3
+  fi
 done
 echo "none" > license_var.txt
 echo "no-license" > rc.txt
@@ -177,10 +188,11 @@ def assemble_report(*, deck: str, gds: str, rules_total: int,
 # ---------------------------------------------------------------------------
 
 def stage_gds(gds_arg: Path, outdir: Path) -> tuple[Path, str]:
-    """Gunzip the staged copy into <out>/work; never touch the original."""
+    """Gunzip a working copy into <repo>/work/<wave>/ (gitignored); the
+    original GDS is only ever read."""
     outdir.mkdir(parents=True, exist_ok=True)
-    work = outdir / "work"
-    work.mkdir(exist_ok=True)
+    work = REPO_ROOT / "work" / outdir.name
+    work.mkdir(parents=True, exist_ok=True)
     local_gds = work / "chip_top_logo_fill.gds"
     try:
         data = gzip.decompress(gds_arg.read_bytes())
@@ -191,37 +203,77 @@ def stage_gds(gds_arg: Path, outdir: Path) -> tuple[Path, str]:
     return local_gds, primary
 
 
+def _gds_record_names(gds_bytes: bytes) -> tuple[set[str], set[str]]:
+    """Walk GDS records; return (defined structures, referenced structures).
+    Record header is 4 bytes: uint16 length (incl. header), uint16 type.
+    STRNAME=0x0606 (definition), SNAME=0x1206 (SREF/AREF reference)."""
+    data = memoryview(gds_bytes)
+    structs: set[str] = set()
+    refs: set[str] = set()
+    pos, n = 0, len(data)
+    while pos + 4 <= n:
+        ln = int.from_bytes(data[pos:pos + 2], "big")
+        rtype = int.from_bytes(data[pos + 2:pos + 4], "big")
+        if ln < 4 or pos + ln > n:
+            break
+        if rtype in (0x0606, 0x1206):
+            name = bytes(data[pos + 4:pos + ln]).decode(
+                "ascii", "replace").rstrip("\x00").strip()
+            (structs if rtype == 0x0606 else refs).add(name)
+        pos += ln
+    return structs, refs
+
+
 def detect_primary(gds_bytes: bytes) -> str:
-    """Top cell name from BGNLIB/STRNAME records (first STRNAME wins)."""
-    i = gds_bytes.find(b"\x00\x06\x06")        # STRNAME record header
-    if i >= 0:
-        ln = int.from_bytes(gds_bytes[i:i + 2], "big")
-        return gds_bytes[i + 4:i + ln].decode("ascii", "replace").strip("\x00")
-    raise StageError("stage-gds", "no STRNAME record found in GDS")
+    """Top cell = defined structure that no other structure references."""
+    structs, refs = _gds_record_names(gds_bytes)
+    tops = sorted(structs - refs)
+    if len(tops) == 1:
+        return tops[0]
+    if not tops and structs:                   # cyclic or flat oddity
+        raise StageError("stage-gds",
+                         f"no unreferenced top cell among {len(structs)} "
+                         f"structures")
+    raise StageError("stage-gds", f"multiple top cells: {tops[:8]}")
+
+
+
+def vm_home() -> str:
+    """Absolute home on the VM (common.vm_push single-quotes the remote path,
+    so $VAR and ~ would NOT expand there — resolve it once, use absolutes)."""
+    rc, out = vm_ssh("echo $HOME", timeout=30)
+    home = out.splitlines()[0].strip() if out else ""
+    if not home.startswith("/"):
+        raise StageError("transfer:vm-push", f"cannot resolve VM HOME: {out}")
+    return home
 
 
 def push_vm(deck_path: Path, gds_local: Path) -> None:
-    rc, out = vm_ssh(f"mkdir -p $HOME/{VM_RUNDIR}", timeout=30)
+    home = vm_home()
+    rundir = f"{home}/{VM_RUNDIR}"
+    rc, out = vm_ssh(f"mkdir -p {rundir}", timeout=30)
     if rc != 0:
         raise StageError("transfer:vm-push", out[-300:])
     gen_deck = deck_path.with_name("sg13g2_beol_gen.drc")
-    for local, remote in ((gen_deck, f"{VM_RUNDIR}/sg13g2_beol_gen.drc"),
-                          (gds_local, f"{VM_RUNDIR}/chip_top_logo_fill.gds")):
-        vm_push(local, f"$HOME/{remote}")
+    for local, remote in ((gen_deck, "sg13g2_beol_gen.drc"),
+                          (gds_local, "chip_top_logo_fill.gds")):
+        vm_push(local, f"{rundir}/{remote}")
     rc, out = vm_ssh(
-        f"ls -la $HOME/{VM_RUNDIR}/sg13g2_beol_gen.drc "
-        f"$HOME/{VM_RUNDIR}/chip_top_logo_fill.gds", timeout=30)
+        f"ls -la {rundir}/sg13g2_beol_gen.drc "
+        f"{rundir}/chip_top_logo_fill.gds", timeout=30)
     if rc != 0:
         raise StageError("transfer:vm-push", out[-300:])
 
 
 def run_calibre(timeout: float) -> str:
     """Launch detached, poll, return discovered license var."""
+    home = vm_home()
+    rundir = f"{home}/{VM_RUNDIR}"
     runner_local = Path("/tmp/pvrun_calibre_runner.sh")
     runner_local.write_text(build_runner_script(LICENSE_CANDIDATES))
-    vm_push(runner_local, f"{VM_RUNDIR}/runner.sh")
+    vm_push(runner_local, f"{rundir}/runner.sh")
     rc, out = vm_ssh(
-        f"cd $HOME/{VM_RUNDIR} && rm -f rc.txt license_var.txt && "
+        f"cd {rundir} && rm -f rc.txt license_var.txt && "
         f"chmod +x runner.sh && nohup ./runner.sh >/dev/null 2>&1 & echo started",
         timeout=30)
     if "started" not in out:
@@ -230,8 +282,8 @@ def run_calibre(timeout: float) -> str:
     while time.monotonic() < deadline:
         time.sleep(POLL_INTERVAL)
         rc, out = vm_ssh(
-            f"cat $HOME/{VM_RUNDIR}/rc.txt 2>/dev/null || echo __RUNNING__;"
-            f" cat $HOME/{VM_RUNDIR}/license_attempts.log 2>/dev/null | tail -3",
+            f"cat {rundir}/rc.txt 2>/dev/null || echo __RUNNING__;"
+            f" tail -3 {rundir}/license_attempts.log 2>/dev/null",
             timeout=45)
         if "__RUNNING__" not in out.splitlines()[0]:
             break
@@ -241,24 +293,45 @@ def run_calibre(timeout: float) -> str:
         raise StageError("run:calibre", f"timed out after {timeout}s")
 
     rc_line = out.splitlines()[0].strip()
-    rc2, lvar = vm_ssh(f"cat $HOME/{VM_RUNDIR}/license_var.txt", timeout=30)
-    if rc_line == "no-license" or lvar.strip() == "none":
-        _, tail = vm_ssh(
-            f"tail -40 $HOME/{VM_RUNDIR}/calibre.log", timeout=30)
+    _, raw = vm_ssh(f"cat {rundir}/license_var.txt", timeout=30)
+    # vm_ssh concatenates ssh stderr (host-key warnings); keep only the var
+    lvar = next((l for l in raw.splitlines()
+                 if re.match(r"^[A-Z_]+=", l)), "")
+    if rc_line == "no-license" or not lvar or lvar.strip() == "none":
+        _, tail = vm_ssh(f"tail -40 {rundir}/calibre.log", timeout=30)
         raise StageError("run:calibre-license",
                          f"all license candidates failed; log tail:\n{tail}")
+    if rc_line.startswith("deck:"):
+        _, tail = vm_ssh(f"tail -40 {rundir}/calibre.log", timeout=30)
+        raise StageError("run:calibre",
+                         f"calibre exited {rc_line[5:]} (deck/layout error, "
+                         f"license={lvar.strip()}); log tail:\n{tail}")
     return lvar.strip()
 
 
 def pull_results(outdir: Path) -> tuple[Path, Path]:
+    home = vm_home()
+    rundir = f"{home}/{VM_RUNDIR}"
     files = {}
-    for remote, local_name in (
-            (f"{VM_RUNDIR}/calibre.log", "calibre.log"),
-            (f"{VM_RUNDIR}/calibre_drc.summary", "calibre_drc.summary"),
-            (f"{VM_RUNDIR}/rc.txt", "rc.txt"),
-            (f"{VM_RUNDIR}/license_var.txt", "license_var.txt")):
+    wanted = (("calibre.log", "calibre.log"),
+              ("calibre_drc.summary", "calibre_drc.summary"),
+              ("calibre_drc.db", "calibre_drc.db"),
+              ("rc.txt", "rc.txt"),
+              ("license_var.txt", "license_var.txt"))
+    for remote, local_name in wanted:
+        if remote == "calibre_drc.db":
+            # results DB can be huge when a layout is dirty; keep it only
+            # when reasonably small, otherwise leave it on the VM
+            _, sz = vm_ssh(f"stat -c %s {rundir}/{remote} 2>/dev/null || echo 0",
+                           timeout=30)
+            sz = next((l for l in sz.splitlines() if l.strip().isdigit()),
+                      "0")
+            if int(sz) > 64 * 1024 * 1024:
+                print(f"[pvrun] skipping {remote} pull ({sz.strip()} bytes)",
+                      file=sys.stderr)
+                continue
         try:
-            data = vm_pull(f"$HOME/{remote}")
+            data = vm_pull(f"{rundir}/{remote}")
         except StageError as e:
             raise StageError("transfer:vm-pull",
                              f"{remote}: {e.detail}") from e
@@ -266,6 +339,8 @@ def pull_results(outdir: Path) -> tuple[Path, Path]:
         p.write_bytes(data)
         files[local_name] = p
     return files["calibre.log"], files["calibre_drc.summary"]
+
+
 
 
 # ---------------------------------------------------------------------------
@@ -347,7 +422,7 @@ def run(args: argparse.Namespace) -> int:
     gds_local, primary = stage_gds(gds_src, outdir)
     deck_text = rewrite_layout(deck_src.read_text(),
                                gds_local.name, primary)
-    gen_deck = outdir / "work/sg13g2_beol_gen.drc"
+    gen_deck = REPO_ROOT / "work" / outdir.name / "sg13g2_beol_gen.drc"
     gen_deck.write_text(deck_text)
     rules_checked = rule_names_from_deck(deck_text)
     print(f"[pvrun] stage-gds ok: primary={primary}, "

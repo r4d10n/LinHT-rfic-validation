@@ -29,6 +29,18 @@ LICENSE_SERVERS = {
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 
+# Canonical ADS2027 environment for the VM (LD_LIBRARY_PATH must include
+# tools/python/lib — the libpython trap; ~/exp/sims/ADS-AGENTS.md §3).
+ADS_ENV_TEXT = (
+    "export ADS=/opt/ads/ADS2027\n"
+    'export HPEESOF_DIR="$ADS" EESOF_LICENSE_FILE=27009@10.180.60.104\n'
+    'export EESOFLIC="$HOME/.eesoflic" LC_ALL=C\n'
+    'export PATH="$ADS/bin:$PATH"\n'
+    'export LD_LIBRARY_PATH="$ADS/lib/linux_x86_64:'
+    '$ADS/circuit/lib.linux_x86_64:$ADS/fem/2027.00/linux_x86_64/bin:'
+    '$ADS/adsptolemy/lib.linux_x86_64:$ADS/tools/python/lib"\n'
+)
+
 
 class StageError(RuntimeError):
     """Failure carrying the exact stage that failed, e.g. 'transfer:vm-push'."""
@@ -57,15 +69,19 @@ def _vm_pass() -> str:
     raise StageError("access:vm-pass", "set LINHT_VM_PASS; no house script found")
 
 
-def vm_ssh(remote_cmd: str, timeout: float = 60.0, check: bool = False) -> tuple[int, str]:
-    """Run a command on the VM; returns (rc, combined output)."""
-    cmd = [
+def _ssh_cmd(remote_cmd: str, timeout: float) -> list[str]:
+    return [
         "sshpass", "-p", _vm_pass(), "ssh",
         "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
         "-o", f"ConnectTimeout={min(10, int(timeout))}",
         "-p", str(VM_HOSTPORT[1]), f"{VM_USER}@{VM_HOSTPORT[0]}", remote_cmd,
     ]
-    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=timeout)
+
+
+def vm_ssh(remote_cmd: str, timeout: float = 60.0, check: bool = False) -> tuple[int, str]:
+    """Run a command on the VM; returns (rc, combined output)."""
+    proc = subprocess.run(_ssh_cmd(remote_cmd, timeout), capture_output=True,
+                          text=True, timeout=timeout)
     out = (proc.stdout + proc.stderr).strip()
     if check and proc.returncode != 0:
         raise StageError("vm-ssh", f"rc={proc.returncode}: {out[-400:]}")
@@ -75,12 +91,7 @@ def vm_ssh(remote_cmd: str, timeout: float = 60.0, check: bool = False) -> tuple
 def vm_push(local: Path, remote_path: str, timeout: float = 120.0) -> None:
     """Copy one file to the VM via cat-over-ssh (scp/sftp disabled on guest)."""
     data = local.read_bytes()
-    cmd = [
-        "sshpass", "-p", _vm_pass(), "ssh",
-        "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
-        "-p", str(VM_HOSTPORT[1]), f"{VM_USER}@{VM_HOSTPORT[0]}",
-        f"cat > '{remote_path}'",
-    ]
+    cmd = _ssh_cmd(f"cat > '{remote_path}'", timeout)
     proc = subprocess.run(cmd, input=data, capture_output=True, timeout=timeout)
     if proc.returncode != 0:
         raise StageError(
@@ -89,13 +100,7 @@ def vm_push(local: Path, remote_path: str, timeout: float = 120.0) -> None:
 
 
 def vm_pull(remote_path: str, timeout: float = 120.0) -> bytes:
-    rc, out = 1, ""
-    cmd = [
-        "sshpass", "-p", _vm_pass(), "ssh",
-        "-o", "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
-        "-p", str(VM_HOSTPORT[1]), f"{VM_USER}@{VM_HOSTPORT[0]}",
-        f"cat '{remote_path}'",
-    ]
+    cmd = _ssh_cmd(f"cat '{remote_path}'", timeout)
     proc = subprocess.run(cmd, capture_output=True, timeout=timeout)
     if proc.returncode != 0:
         raise StageError("transfer:vm-pull",

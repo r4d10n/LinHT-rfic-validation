@@ -2,10 +2,9 @@
 """G003 circuit cross-check harness: one testbench, three simulators.
 
 Reference of record: ngspice running the repo deck unmodified in the
-linht_iic container (its .control/wrdata CSV is parsed directly).
-Cross-checks: hpeesofsim on the VM (netadapt --target ads deck, MDS raw
-output parsed by tools/rawread_ads.py) and Spectre (netadapt --target
-spectre deck, psfascii output).
+linht_iic container (.control/wrdata CSV parsed directly).
+Cross-checks: hpeesofsim on VM samjna (netadapt --target ads deck; default
+.ds dataset dumped to text via dsdump on the VM and parsed here).
 
 Stages are named adapt/push/run/parse/compare so failures identify exactly
 where they broke (AGENTS.md contract).
@@ -22,35 +21,27 @@ import time
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from common import REPO_ROOT, StageError, container_exec, emit, vm_pull, vm_ssh, _vm_pass
+from common import REPO_ROOT, StageError, container_exec, vm_pull, vm_ssh, _vm_pass
 from netadapt import adapt
 
 EVIDENCE = REPO_ROOT / "evidence"
 VM_WORKROOT = "~/linht_val"
-ADS_ENV = (
-    'export ADS=/opt/ads/ADS2027; '
-    'export HPEESOF_DIR="$ADS" EESOF_LICENSE_FILE=27009@10.180.60.104 '
-    'EESOFLIC="$HOME/.eesoflic" LC_ALL=C; '
-    'export PATH="$ADS/bin:$PATH"; '
-    'export LD_LIBRARY_PATH="$ADS/lib/linux_x86_64:$ADS/circuit/lib.linux_x86_64:'
-    '$ADS/fem/2027.00/linux_x86_64/bin:$ADS/adsptolemy/lib.linux_x86_64:'
-    '$ADS/tools/python/lib"'
-)
 
-# canonical signal -> per-tool vector names (ads/spectre spellings verified
-# against first live outputs; adjust there if a tool renames)
+# canonical signal -> per-tool vector names.
+# ads: verified against dsdump of probeD/probeJ — nodes by bare name,
+# source currents as <InstanceName>.i. ngspice: wrdata column names.
 DEFAULT_SIGNALS = {
     "lo_i": {"ng": "v(lo_i)", "ads": "lo_i", "spectre": "lo_i"},
     "lo_q": {"ng": "v(lo_q)", "ads": "lo_q", "spectre": "lo_q"},
     "clk_vco_div": {"ng": "v(clk_vco_div)", "ads": "clk_vco_div",
                     "spectre": "clk_vco_div"},
-    "i_vdd": {"ng": "i(vdd)", "ads": "i_vdd", "spectre": "i_vdd"},
+    "i_vdd": {"ng": "i(vdd)", "ads": "Vdd.i", "spectre": "Vdd:p"},
 }
 
 
 # ------------------------------------------------------------ parsers
 def parse_ngspice_csv(lines: list[str], col: str) -> tuple[list[float], list[float]]:
-    """wrdata CSV: columns alternate time,value per signal; header row has names."""
+    """wrdata CSV: columns alternate time,value per signal; header has names."""
     header = [h.strip() for h in lines[0].strip().split(",")]
     if col not in header:
         raise StageError("parse:ngspice-column", f"{col} not in {header}")
@@ -68,37 +59,51 @@ def parse_ngspice_csv(lines: list[str], col: str) -> tuple[list[float], list[flo
     return ts, vs
 
 
-def load_rawread():
-    sys.path.insert(0, str(REPO_ROOT / "tools"))
-    import rawread_ads
-    return rawread_ads
+# dsdump declares e.g. `    0: "time" 0 r` plus a flags attribute line
+# carrying `indep=yes`; dependents follow per point after the `idx: t` line.
+DS_DECL_RE = re.compile(r'^\s*(\d+):\s+"([^"]+)"\s+\d+\s+([a-z])$')
+DS_INDEP_RE = re.compile(r"indep\s*=\s*yes")
 
-
-def parse_ads_raw(path: Path, want: list[str]) -> dict[str, tuple[list, list]]:
-    """canonical->(t, v) via best-effort vector name match in the MDS raw."""
-    rr = load_rawread()
-    plots = rr.read_raw(str(path))
-    plot = plots[0]
-    variables = plot.get("vars", [])
-    data = plot.get("data", {})
-    tvec = None
-    for cand in ("time", "V.time", "t"):
-        if cand in data:
-            tvec = data[cand]
-            break
-    if tvec is None and variables:
-        tvec = data[variables[0]]
-    out = {}
-    for w in want:
-        hit = None
-        for v in variables:
-            base = v.split(".")[-1].split(":")[-1].lower()
-            if base == w.lower() or base == w.lower().replace("_", ""):
-                hit = v
-                break
-        if hit is None:
-            raise StageError("parse:ads-vector", f"{w} not in {variables[:20]}")
-        out[w] = (list(map(float, tvec)), list(map(float, data[hit])))
+def parse_ads_dataset(text: str) -> dict[str, list[float]]:
+    """dsdump text. Declarations: `<n>: "name" <type> <r|c>` each followed by
+    a flags line; exactly one has `indep=yes` (time). Point rows are
+    `idx: <indep value>` then one value line per DEPENDENT, in order."""
+    indep, deps = None, []
+    for num, name, typ in DS_DECL_RE.findall(text):
+        flags_at = text.find(f'"{name}"', 0)
+        seg = text[flags_at: flags_at + 200]
+        if DS_INDEP_RE.search(seg):
+            indep = name
+        else:
+            deps.append(name)
+    m = re.search(r"\* Number of points:\s*(\d+)", text)
+    if not m or not deps or indep is None:
+        raise StageError("parse:dsdump", "declarations incomplete")
+    npts = int(m.group(1))
+    lines = text.split("* Number of points:")[-1].splitlines()
+    idx_re = re.compile(r"^(\d+):\s*([-+\d.eE]+)$")
+    val_re = re.compile(r"^([-+\d.eENa]+)$")
+    times: list[float] = []
+    vals: list[list[float]] = [[] for _ in deps]
+    i = 0
+    while i < len(lines):
+        mm = idx_re.match(lines[i].strip())
+        if mm:
+            times.append(float(mm.group(2)))
+            for d in range(len(deps)):
+                i += 1
+                vm_ = val_re.match(lines[i].strip())
+                if not vm_:
+                    raise StageError("parse:dsdump",
+                                     f"point {mm.group(1)}: expected value, "
+                                     f"got {lines[i]!r}")
+                vals[d].append(float(vm_.group(1)))
+        i += 1
+    if len(times) != npts:
+        raise StageError("parse:dsdump",
+                         f"{len(times)} rows parsed vs {npts} declared")
+    out = {"time": times}
+    out.update(zip(deps, vals))
     return out
 
 
@@ -152,7 +157,7 @@ def compare_waveforms(t_ref, v_ref, t_new, v_new) -> dict:
     vn = _interp(tq, t_new, v_new)
     num = sum((a - b) ** 2 for a, b in zip(vr, vn)) ** 0.5
     den = sum(a ** 2 for a in vr) ** 0.5 or 1e-30
-    span = max(max(vr) - min(vr), abs(vr[0])) or 1e-30
+    span = max(max(vr) - min(vr), abs(vr[0]), 1e-30)
     mx = max(abs(a - b) for a, b in zip(vr, vn)) / span
     return {"l2rel": num / den, "maxrel_span": mx, "points": len(tq),
             "window": [t_lo, t_hi]}
@@ -176,8 +181,8 @@ def run_ngspice_reference(tb: Path, timeout: float = 900) -> Path:
 
 
 def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
-                     timeout_s: int = 1200) -> dict:
-    """Stage dir -> VM, run hpeesofsim detached, poll, pull raw+log."""
+                     timeout_s: int = 1500) -> dict:
+    """Stage dir -> VM, hpeesofsim detached, poll, dsdump, pull text+log."""
     remote_dir = f"{VM_WORKROOT}/{case}"
     tarball = Path("/tmp") / f"{case}_stage.tgz"
     with tarfile.open(tarball, "w:gz") as tf:
@@ -195,67 +200,89 @@ def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
         raise StageError("transfer:vm-push",
                          (proc.stderr or b"?").decode(errors="replace")[-300:])
     netlist = next(staging.glob("ads_*.net")).name
-    vm_ssh(f"cd {remote_dir} && nohup sh -c \"{ADS_ENV} && "
-           f"hpeesofsim -n {netlist} -r out.raw > sim.log 2>&1\" "
-           f"> /dev/null 2>&1 & echo STARTED", check=True)
-    tail, finished = "", False
+    stem = netlist[len("ads_"):-len(".net")]
+    vm_ssh(f"cd {remote_dir} && chmod +x adsenv.sh && "
+           "nohup sh -c '. ./adsenv.sh && "
+           f"hpeesofsim -n {netlist} > sim.log 2>&1 && "
+           f"dsdump {stem}.ds > dataset.txt' "
+           "> /dev/null 2>&1 & echo STARTED", check=True)
+    tail, done = "", False
     t0 = time.time()
     while time.time() - t0 < timeout_s:
         time.sleep(poll_sec)
-        _, tail = vm_ssh(f"cd {remote_dir} && tail -4 sim.log 2>/dev/null")
-        if "Simulation finished" in tail or "Simulation aborted" in tail \
-                or re.search(r"\bERROR\b", tail):
+        _, tail = vm_ssh(
+            f"cd {remote_dir} && "
+            "if [ -s dataset.txt ] && grep -q 'Simulation finished' sim.log; "
+            "then echo DONE_OK; fi; "
+            "grep -m1 'terminated due to an error' sim.log || true")
+        if "DONE_OK" in tail:
+            done = True
             break
+        if "terminated due to an error" in tail:
+            _, why = vm_ssh(f"cd {remote_dir} && grep -i -B2 -A4 -m2 error sim.log")
+            raise StageError("run:hpeesofsim", why or tail)
     else:
         raise StageError("run:hpeesofsim", f"timeout after {timeout_s}s: {tail}")
-    _, done = vm_ssh(f"cd {remote_dir} && grep -c 'Simulation finished' sim.log || true")
-    finished = "1" in done.split()
-    if not finished:
-        _, why = vm_ssh(f"cd {remote_dir} && grep -i -m6 -e error -e abort sim.log")
-        raise StageError("run:hpeesofsim", why or tail)
+    if not done:
+        raise StageError("run:hpeesofsim", f"incomplete: {tail}")
     outdir = EVIDENCE / "logs"
     outdir.mkdir(parents=True, exist_ok=True)
-    (outdir / f"{case}_ads.out.raw").write_bytes(vm_pull(f"{remote_dir}/out.raw"))
+    dataset = vm_pull(f"{remote_dir}/dataset.txt").decode(errors="replace")
+    (outdir / f"{case}_ads.dataset.txt").write_text(dataset)
     log = vm_ssh(f"cat {remote_dir}/sim.log")[1] + "\n"
     (outdir / f"{case}_ads.sim.log").write_text(log)
-    return {"raw": outdir / f"{case}_ads.out.raw",
+    return {"dataset": outdir / f"{case}_ads.dataset.txt",
             "log": outdir / f"{case}_ads.sim.log"}
 
 
 # ------------------------------------------------------------ case driver
-def run_case_ngspice(tb: Path, signals: list[str]) -> dict:
-    csv = run_ngspice_reference(tb)
-    lines = csv.read_text().splitlines()
-    parsed = {}
-    for s in signals:
-        ts, vs = parse_ngspice_csv(lines, DEFAULT_SIGNALS[s]["ng"])
-        parsed[s] = (ts, vs)
-    return parsed
-
-
 def xcheck_ads(case: str, tb: Path, corner: str, params: dict,
                signals: list[str], tol: dict) -> dict:
     staging = Path("/tmp/xcheck") / f"{case}_ads"
-    netlist = adapt(tb, "ads", corner, staging, params)
+    adapt(tb, "ads", corner, staging, params)
     artifacts = push_and_run_ads(staging, case)
-    ref = run_case_ngspice(tb, signals)
-    want = [DEFAULT_SIGNALS[s]["ads"] for s in signals]
-    new = parse_ads_raw(artifacts["raw"], want)
-    metrics, verdict = {}, True
+
+    csv = run_ngspice_reference(tb)
+    lines = csv.read_text().splitlines()
+    ref = {s: parse_ngspice_csv(lines, DEFAULT_SIGNALS[s]["ng"])
+           for s in signals}
+
+    data = parse_ads_dataset(Path(artifacts["dataset"]).read_text())
     l2max = float(tol.get("l2rel", 0.05))
     mxmax = float(tol.get("maxrel_span", 0.10))
+    metrics, verdict = {}, True
     for s in signals:
-        m = compare_waveforms(ref[s][0], ref[s][1],
-                              new[DEFAULT_SIGNALS[s]["ads"]][0],
-                              new[DEFAULT_SIGNALS[s]["ads"]][1])
+        ads_name = DEFAULT_SIGNALS[s]["ads"]
+        if ads_name not in data:
+            raise StageError("parse:ads-vector",
+                             f"{ads_name} not in dataset vars {list(data)}")
+        new = (data["time"], data[ads_name])
+        m = compare_waveforms(ref[s][0], ref[s][1], new[0], new[1])
         ok = m["l2rel"] <= l2max and m["maxrel_span"] <= mxmax
         verdict &= ok
         metrics[s] = {"metrics": m, "ok": bool(ok)}
     return {"case": case, "corner": corner, "params": params,
             "reference": {"tool": "ngspice", "deck": str(tb)},
-            "crosscheck": {"tool": "hpeesofsim", "netlist": str(netlist),
+            "crosscheck": {"tool": "hpeesofsim",
                            "log": str(artifacts["log"])},
             "signals": metrics, "verdict": "PASS" if verdict else "FAIL"}
+
+
+# ------------------------------------------------------------ self test
+DS_FIXTURE = '''* Vectorset name: "Tran1.TRAN"
+    0: "time" 0 r
+    1: "lo_i" 0 r
+    2: "Vdd.i" 0 r
+----------
+* Number of points: 2
+0: 0
+0
+0.001
+1
+1: 5e-11
+1
+0.002
+2'''
 
 
 def self_test() -> int:
@@ -268,9 +295,13 @@ def self_test() -> int:
     m2 = compare_waveforms(t, a, t, [-x for x in a])
     assert m2["l2rel"] > 1.0
 
-    csv = ("time,v(lo_i),v(lo_q)\n0,0,1\n1e-9,0.5,0.5\n2e-9,1.5,0\n")
+    csv = "time,v(lo_i),v(lo_q)\n0,0,1\n1e-9,0.5,0.5\n2e-9,1.5,0\n"
     tv, vals = parse_ngspice_csv(csv.splitlines(), "v(lo_i)")
     assert tv == [0.0, 1e-9, 2e-9] and vals == [0.0, 0.5, 1.5]
+
+    got = parse_ads_dataset(DS_FIXTURE)
+    assert got["time"] == [0.0, 5e-11], got
+    assert got["lo_i"] == [0.0, 1.0] and got["Vdd.i"] == [0.001, 0.002]
 
     psf = """
 VALUE
@@ -304,30 +335,21 @@ def main() -> int:
     if args.self_test:
         return self_test()
 
-    cfg = json.loads(json.dumps({}))  # placeholder replaced below
     import yaml
     cfg = yaml.safe_load((REPO_ROOT / "config" / "cases.yaml").read_text())
     case_cfg = cfg["cases"][args.case]
     signals = args.signal or case_cfg.get("signals", list(DEFAULT_SIGNALS))
-    params = case_cfg.get("params", {})
+    params = dict(case_cfg.get("params", {}))
     params.update(dict(kv.split("=", 1) for kv in args.param))
-    tb = args.tb or LINHT_TB(case_cfg["tb"])
+    tb = args.tb or (REPO_ROOT.parent / "LinHT-rfic" / case_cfg["tb"])
 
     rep = xcheck_ads(args.case, tb, args.corner, params, signals,
                      cfg.get("transient", {}))
     EVIDENCE.mkdir(exist_ok=True)
-    outfile = EVIDENCE / f"{args.case}_{args.corner}_{args.target_default()}.json"
+    outfile = EVIDENCE / f"{args.case}_{args.corner}_ads_report.json"
     outfile.write_text(json.dumps(rep, indent=2))
     print(json.dumps({"report": str(outfile), "verdict": rep["verdict"]}))
     return 0 if rep["verdict"] == "PASS" else 1
-
-
-def LINHT_TB(rel: str) -> Path:
-    return REPO_ROOT.parent / "LinHT-rfic" / rel
-
-
-def _target_default() -> str:
-    return "ads"
 
 
 if __name__ == "__main__":

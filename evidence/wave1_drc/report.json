@@ -1,0 +1,228 @@
+{
+  "tool": "calibre",
+  "deck": "calibre/sg13g2_beol.drc",
+  "gds": "/home/rfsoc/exp/rfic/LinHT-rfic/layout/chip_top_logo_fill.gds.gz",
+  "rules_total": 40,
+  "violations": [
+    {
+      "rule": "M1_a",
+      "count": 0
+    },
+    {
+      "rule": "M1_b",
+      "count": 0
+    },
+    {
+      "rule": "M2_a",
+      "count": 0
+    },
+    {
+      "rule": "M2_b",
+      "count": 0
+    },
+    {
+      "rule": "M3_a",
+      "count": 0
+    },
+    {
+      "rule": "M3_b",
+      "count": 0
+    },
+    {
+      "rule": "M4_a",
+      "count": 0
+    },
+    {
+      "rule": "M4_b",
+      "count": 0
+    },
+    {
+      "rule": "M5_a",
+      "count": 0
+    },
+    {
+      "rule": "M5_b",
+      "count": 0
+    },
+    {
+      "rule": "TM1_a",
+      "count": 0
+    },
+    {
+      "rule": "TM1_b",
+      "count": 0
+    },
+    {
+      "rule": "TM2_a",
+      "count": 0
+    },
+    {
+      "rule": "TM2_b",
+      "count": 0
+    },
+    {
+      "rule": "TV1_a_A",
+      "count": 0
+    },
+    {
+      "rule": "TV1_a_w",
+      "count": 0
+    },
+    {
+      "rule": "TV1_b",
+      "count": 0
+    },
+    {
+      "rule": "TV1_c",
+      "count": 0
+    },
+    {
+      "rule": "TV1_d",
+      "count": 0
+    },
+    {
+      "rule": "TV2_a_A",
+      "count": 0
+    },
+    {
+      "rule": "TV2_a_w",
+      "count": 0
+    },
+    {
+      "rule": "TV2_b",
+      "count": 0
+    },
+    {
+      "rule": "TV2_c",
+      "count": 0
+    },
+    {
+      "rule": "TV2_d",
+      "count": 0
+    },
+    {
+      "rule": "V1_a_A",
+      "count": 0
+    },
+    {
+      "rule": "V1_a_w",
+      "count": 0
+    },
+    {
+      "rule": "V1_b",
+      "count": 0
+    },
+    {
+      "rule": "V1_c",
+      "count": 0
+    },
+    {
+      "rule": "V2_a_A",
+      "count": 0
+    },
+    {
+      "rule": "V2_a_w",
+      "count": 0
+    },
+    {
+      "rule": "V2_b",
+      "count": 0
+    },
+    {
+      "rule": "V2_c",
+      "count": 0
+    },
+    {
+      "rule": "V3_a_A",
+      "count": 0
+    },
+    {
+      "rule": "V3_a_w",
+      "count": 0
+    },
+    {
+      "rule": "V3_b",
+      "count": 0
+    },
+    {
+      "rule": "V3_c",
+      "count": 0
+    },
+    {
+      "rule": "V4_a_A",
+      "count": 0
+    },
+    {
+      "rule": "V4_a_w",
+      "count": 0
+    },
+    {
+      "rule": "V4_b",
+      "count": 0
+    },
+    {
+      "rule": "V4_c",
+      "count": 0
+    }
+  ],
+  "violations_nonzero": [],
+  "total_violations": 0,
+  "parse_ok": true,
+  "log": "/home/rfsoc/exp/rfic/LinHT-rfic-validation/evidence/wave1_drc/calibre.log",
+  "license_var": "MGLS_LICENSE_FILE=1717@10.180.60.101",
+  "magic_baseline_total": 0,
+  "delta_vs_magic": {
+    "magic_count": 0,
+    "calibre_count": 0,
+    "note": "magic reports aggregate COUNT only (0 rules listed); per-rule delta lives in docs/calibre_deck_notes.md"
+  },
+  "meta": {
+    "harness": "pvrun.py",
+    "rundir_on_vm": "~/pv_wave1",
+    "calibre_cmd": "/opt/siemens/calibre/bin/calibre -drc -hier sg13g2_beol_gen.drc",
+    "rules_checked": [
+      "M1_a",
+      "M1_b",
+      "M2_a",
+      "M2_b",
+      "M3_a",
+      "M3_b",
+      "M4_a",
+      "M4_b",
+      "M5_a",
+      "M5_b",
+      "V1_a_w",
+      "V1_a_A",
+      "V1_b",
+      "V1_c",
+      "V2_a_w",
+      "V2_a_A",
+      "V2_b",
+      "V2_c",
+      "V3_a_w",
+      "V3_a_A",
+      "V3_b",
+      "V3_c",
+      "V4_a_w",
+      "V4_a_A",
+      "V4_b",
+      "V4_c",
+      "TV1_a_w",
+      "TV1_a_A",
+      "TV1_b",
+      "TV1_c",
+      "TV1_d",
+      "TV2_a_w",
+      "TV2_a_A",
+      "TV2_b",
+      "TV2_c",
+      "TV2_d",
+      "TM1_a",
+      "TM1_b",
+      "TM2_a",
+      "TM2_b"
+    ],
+    "magic_baseline_report": "/home/rfsoc/exp/rfic/LinHT-rfic/verification/drc/chip_top_logo_fill.magic.drc.rpt",
+    "subset_note": "wave-1 BEOL subset; see docs/calibre_deck_notes.md"
+  }
+}

@@ -1,0 +1,104 @@
+
+
+==================================================================================
+=== CALIBRE::DRC-H SUMMARY REPORT
+===
+Execution Date/Time:       Wed Aug 26 02:34:05 2026
+Calibre Version:           v2026.3_27.19    Thu Aug 6 14:59:14 PDT 2026
+Rule File Pathname:        sg13g2_beol_gen.drc
+Rule File Title:           
+Layout System:             GDS
+Layout Path(s):            chip_top_logo_fill.gds
+Layout Primary Cell:       chip_top_logo_fill
+Current Directory:         /home/rakesh/pv_wave1
+User Name:                 rakesh
+Maximum Results/RuleCheck: 100000
+Maximum Result Vertices:   4096
+DRC Results Database:      calibre_drc.db (ASCII)
+Layout Depth:              ALL
+Text Depth:                PRIMARY
+Summary Report File:       calibre_drc.summary (REPLACE)
+Geometry Flagging:         ACUTE = NO  SKEW = NO  ANGLED = NO  OFFGRID = NO
+                           NONSIMPLE POLYGON = NO  NONSIMPLE PATH = NO
+Excluded Cells:           
+CheckText Mapping:         COMMENT TEXT + RULE FILE INFORMATION
+Layers:                    MEMORY-BASED
+Keep Empty Checks:         YES
+----------------------------------------------------------------------------------
+--- RUNTIME WARNINGS
+---
+----------------------------------------------------------------------------------
+--- ORIGINAL LAYER STATISTICS
+---
+LAYER M1F ........ TOTAL Original Geometry Count = 51615 (1103948)
+LAYER M1 ......... TOTAL Original Geometry Count = 51615 (1103948)
+LAYER M2F ........ TOTAL Original Geometry Count = 94767 (909662)
+LAYER M2 ......... TOTAL Original Geometry Count = 94767 (909662)
+LAYER M3F ........ TOTAL Original Geometry Count = 51925 (403682)
+LAYER M3 ......... TOTAL Original Geometry Count = 51925 (403682)
+LAYER M4F ........ TOTAL Original Geometry Count = 51181 (71214)
+LAYER M4 ......... TOTAL Original Geometry Count = 51181 (71214)
+LAYER M5F ........ TOTAL Original Geometry Count = 54569 (61361)
+LAYER M5 ......... TOTAL Original Geometry Count = 54569 (61361)
+LAYER TM1F ....... TOTAL Original Geometry Count = 8001  (11024)
+LAYER TM1 ........ TOTAL Original Geometry Count = 8001  (11024)
+LAYER TM2F ....... TOTAL Original Geometry Count = 10548 (12522)
+LAYER TM2 ........ TOTAL Original Geometry Count = 10548 (12522)
+LAYER EDGESEAL ... TOTAL Original Geometry Count = 25    (25)
+LAYER V1 ......... TOTAL Original Geometry Count = 17126 (418084)
+LAYER V2 ......... TOTAL Original Geometry Count = 34851 (241791)
+LAYER V3 ......... TOTAL Original Geometry Count = 17411 (170799)
+LAYER V4 ......... TOTAL Original Geometry Count = 19687 (183408)
+LAYER TV1 ........ TOTAL Original Geometry Count = 22956 (89796)
+LAYER TV2 ........ TOTAL Original Geometry Count = 11238 (56580)
+----------------------------------------------------------------------------------
+--- RULECHECK RESULTS STATISTICS
+---
+RULECHECK M1_a ...... TOTAL Result Count = 0 (0)
+RULECHECK M1_b ...... TOTAL Result Count = 0 (0)
+RULECHECK M2_a ...... TOTAL Result Count = 0 (0)
+RULECHECK M2_b ...... TOTAL Result Count = 0 (0)
+RULECHECK M3_a ...... TOTAL Result Count = 0 (0)
+RULECHECK M3_b ...... TOTAL Result Count = 0 (0)
+RULECHECK M4_a ...... TOTAL Result Count = 0 (0)
+RULECHECK M4_b ...... TOTAL Result Count = 0 (0)
+RULECHECK M5_a ...... TOTAL Result Count = 0 (0)
+RULECHECK M5_b ...... TOTAL Result Count = 0 (0)
+RULECHECK V1_a_w .... TOTAL Result Count = 0 (0)
+RULECHECK V1_a_A .... TOTAL Result Count = 0 (0)
+RULECHECK V1_b ...... TOTAL Result Count = 0 (0)
+RULECHECK V1_c ...... TOTAL Result Count = 0 (0)
+RULECHECK V2_a_w .... TOTAL Result Count = 0 (0)
+RULECHECK V2_a_A .... TOTAL Result Count = 0 (0)
+RULECHECK V2_b ...... TOTAL Result Count = 0 (0)
+RULECHECK V2_c ...... TOTAL Result Count = 0 (0)
+RULECHECK V3_a_w .... TOTAL Result Count = 0 (0)
+RULECHECK V3_a_A .... TOTAL Result Count = 0 (0)
+RULECHECK V3_b ...... TOTAL Result Count = 0 (0)
+RULECHECK V3_c ...... TOTAL Result Count = 0 (0)
+RULECHECK V4_a_w .... TOTAL Result Count = 0 (0)
+RULECHECK V4_a_A .... TOTAL Result Count = 0 (0)
+RULECHECK V4_b ...... TOTAL Result Count = 0 (0)
+RULECHECK V4_c ...... TOTAL Result Count = 0 (0)
+RULECHECK TV1_a_w ... TOTAL Result Count = 0 (0)
+RULECHECK TV1_a_A ... TOTAL Result Count = 0 (0)
+RULECHECK TV1_b ..... TOTAL Result Count = 0 (0)
+RULECHECK TV1_c ..... TOTAL Result Count = 0 (0)
+RULECHECK TV1_d ..... TOTAL Result Count = 0 (0)
+RULECHECK TV2_a_w ... TOTAL Result Count = 0 (0)
+RULECHECK TV2_a_A ... TOTAL Result Count = 0 (0)
+RULECHECK TV2_b ..... TOTAL Result Count = 0 (0)
+RULECHECK TV2_c ..... TOTAL Result Count = 0 (0)
+RULECHECK TV2_d ..... TOTAL Result Count = 0 (0)
+RULECHECK TM1_a ..... TOTAL Result Count = 0 (0)
+RULECHECK TM1_b ..... TOTAL Result Count = 0 (0)
+RULECHECK TM2_a ..... TOTAL Result Count = 0 (0)
+RULECHECK TM2_b ..... TOTAL Result Count = 0 (0)
+----------------------------------------------------------------------------------
+--- SUMMARY
+---
+TOTAL CPU Time:                  3
+TOTAL REAL Time:                 4
+TOTAL Original Layer Geometries: 768506 (6307309)
+TOTAL DRC RuleChecks Executed:   40
+TOTAL DRC Results Generated:     0 (0)

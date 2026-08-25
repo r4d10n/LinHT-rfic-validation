@@ -27,7 +27,12 @@ def read_raw(path):
         raw = b[k:end]
         per = nvar * width * (2 if cplx else 1)
         npts = int(npts_m.group(1)) if npts_m else len(raw) // per
-        arr = np.frombuffer(raw[:npts * per], dtype='<f8' if width == 8 else '<f4')
+        # MDS order marker: 'ABCDEFG' = little-endian, 'GFEDCBA' = big-endian
+        parts = b[j:k].rstrip(b'\n').split(b':')
+        order_mark = parts[2] if len(parts) >= 3 else b'ABCDEFG'
+        dt = ('<' if order_mark.startswith(b'A') else '>') + \
+             ('f8' if width == 8 else 'f4')
+        arr = np.frombuffer(raw[:npts * per], dtype=dt)
         if cplx:
             arr = arr.reshape(npts, nvar, 2); arr = arr[..., 0] + 1j * arr[..., 1]
         else:
