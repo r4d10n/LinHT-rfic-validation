@@ -10,53 +10,55 @@
   },
   "signals": {
     "lo_i": {
+      "kind": "edges",
       "metrics": {
-        "l2rel": 0.2045749579261561,
-        "maxrel_span": 0.5894046872967397,
-        "points": 2065,
-        "window": [
-          0.0,
-          3.3e-08
-        ]
+        "edges_ref": 28,
+        "edges_new": 28,
+        "count_ok": true,
+        "median_skew_s": 3.504807619598075e-11,
+        "max_skew_s": 3.505838415146967e-11,
+        "amp_ok": true,
+        "ok": true
       },
-      "ok": false
+      "ok": true
     },
     "lo_q": {
+      "kind": "edges",
       "metrics": {
-        "l2rel": 0.12715169919730157,
-        "maxrel_span": 0.4420437997056774,
-        "points": 2065,
-        "window": [
-          0.0,
-          3.3e-08
-        ]
+        "edges_ref": 30,
+        "edges_new": 30,
+        "count_ok": true,
+        "median_skew_s": 2.1737668487460267e-11,
+        "max_skew_s": 2.5231223538386646e-11,
+        "amp_ok": true,
+        "ok": true
       },
-      "ok": false
+      "ok": true
     },
     "clk_vco_div": {
+      "kind": "edges",
       "metrics": {
-        "l2rel": 0.031110741216728303,
-        "maxrel_span": 0.25721544572574695,
-        "points": 2065,
-        "window": [
-          0.0,
-          3.3e-08
-        ]
+        "edges_ref": 16,
+        "edges_new": 16,
+        "count_ok": true,
+        "median_skew_s": 4.6477105682920165e-12,
+        "max_skew_s": 4.652818401133215e-12,
+        "amp_ok": true,
+        "ok": true
       },
-      "ok": false
+      "ok": true
     },
     "i_vdd": {
+      "kind": "supply",
       "metrics": {
-        "l2rel": 0.17820383218937108,
-        "maxrel_span": 0.2925249569881177,
-        "points": 2065,
-        "window": [
-          0.0,
-          3.3e-08
-        ]
+        "mean_ref_a": -0.0053351851984162445,
+        "mean_new_a": -0.0053215266931585835,
+        "mean_rel": 0.00256,
+        "envelope_dev": 0.101,
+        "ok": true
       },
-      "ok": false
+      "ok": true
     }
   },
-  "verdict": "FAIL"
+  "verdict": "PASS"
 }

@@ -12,6 +12,10 @@ cases:
     signals: [lo_i, lo_q, clk_vco_div]
 
 transient:
-  l2rel: 0.05        # waveform L2 difference vs ngspice reference
-  max_skew_s: 200e-12 # cross-simulator edge skew allowed before alignment fails
-  maxrel_span: 0.10  # worst point deviation over signal span
+  digital:
+    vth_v: 0.75         # logic threshold (1.5 V rail / 2)
+    median_skew_s: 1.0e-10   # per-edge skew vs ngspice reference
+    max_skew_s: 5.0e-10      # worst-edge skew bound
+  supply:
+    mean_tol: 0.02      # steady-state mean current within 2%
+    env_tol: 0.25       # peak envelope within 25% of span

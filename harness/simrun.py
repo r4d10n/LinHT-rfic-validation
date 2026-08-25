@@ -2,12 +2,16 @@
 """G003 circuit cross-check harness: one testbench, three simulators.
 
 Reference of record: ngspice running the repo deck unmodified in the
-linht_iic container (.control/wrdata CSV parsed directly).
-Cross-checks: hpeesofsim on VM samjna (netadapt --target ads deck; default
-.ds dataset dumped to text via dsdump on the VM and parsed here).
+linht_iic container (wrdata CSV). Cross-check: hpeesofsim on VM samjna
+(netadapt --target ads deck; .ds extracted VM-side).
 
-Stages are named adapt/push/run/parse/compare so failures identify exactly
-where they broke (AGENTS.md contract).
+Metric families (config/cases.yaml -> transient):
+- digital signals (logic outputs): rising-edge count equality + per-edge
+  skew bounds + logic-swing match. Pointwise L2 is meaningless on square
+  waves when device-model differences accumulate ~20 ps/edge of phase.
+- current rails (i_*): moving-average smoothed L2 (spike positions shift
+  sub-ns between simulators).
+Stages are named adapt/push/run/parse/compare per AGENTS.md contract.
 """
 from __future__ import annotations
 
@@ -18,6 +22,8 @@ import subprocess
 import sys
 import tarfile
 import time
+from collections import deque
+import statistics
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
@@ -29,7 +35,7 @@ VM_WORKROOT = "~/linht_val"
 
 # canonical signal -> per-tool vector names.
 # ads: verified against dsdump of probeD/probeJ — nodes by bare name,
-# source currents as <InstanceName>.i. ngspice: wrdata column names.
+# source currents as <InstanceName>.i. ngspice: wrdata vector names.
 DEFAULT_SIGNALS = {
     "lo_i": {"ng": "v(lo_i)", "ads": "lo_i", "spectre": "lo_i"},
     "lo_q": {"ng": "v(lo_q)", "ads": "lo_q", "spectre": "lo_q"},
@@ -68,27 +74,23 @@ def parse_ngspice_csv(lines: list[str], pair_idx: int) -> tuple[list[float], lis
     return ts, vs
 
 
-# dsdump declares e.g. `    0: "time" 0 r` plus a flags attribute line
-# carrying `indep=yes`; dependents follow per point after the `idx: t` line.
 DS_DECL_RE = re.compile(r'^\s*(\d+):\s+"([^"]+)"\s+\d+\s+([a-z])$', re.M)
 DS_INDEP_RE = re.compile(r"indep\s*=\s*yes")
 
+
 def parse_ads_dataset(text: str) -> dict[str, list[float]]:
-    """dsdump text. Declarations: `<n>: "name" <type> <r|c>` each followed by
-    a flags line; exactly one has `indep=yes` (time). Point rows are
-    `idx: <indep value>` then one value line per DEPENDENT, in order."""
+    """dsdump text. Declarations `<n>: "name" <t> <r|c>` (time carries
+    indep=yes); point rows `idx: <time>` then one value per dependent."""
     indep, deps = None, []
     for num, name, typ in DS_DECL_RE.findall(text):
-        flags_at = text.find(f'"{name}"', 0)
-        seg = text[flags_at: flags_at + 200]
-        if DS_INDEP_RE.search(seg):
+        flags_at = text.find(f'"{name}"')
+        if DS_INDEP_RE.search(text[flags_at:flags_at + 200]):
             indep = name
         else:
             deps.append(name)
     m = re.search(r"\* Number of points:\s*(\d+)", text)
     if indep is None and deps:
-        # minimal dumps omit the flags block; dsdump always lists time first
-        indep = deps.pop(0)
+        indep = deps.pop(0)  # minimal dumps omit flags; time is listed first
     if not m or not deps or indep is None:
         raise StageError("parse:dsdump", "declarations incomplete")
     npts = int(m.group(1))
@@ -144,7 +146,7 @@ def parse_psfascii(path: Path, want: list[str]) -> dict[str, tuple[list, list]]:
     return out
 
 
-# ------------------------------------------------------------ comparator
+# ------------------------------------------------------------ comparators
 def _interp(tq: list[float], t: list[float], v: list[float]) -> list[float]:
     out, j = [], 0
     for q in tq:
@@ -161,18 +163,15 @@ def _interp(tq: list[float], t: list[float], v: list[float]) -> list[float]:
 
 def compare_waveforms(t_ref, v_ref, t_new, v_new,
                       max_skew: float = 0.0) -> dict:
-    """L2-relative difference on the reference grid within overlap.
-
-    With max_skew>0, additionally finds the time shift tau<=max_skew that
-    minimises l2rel (cross-simulator edge skew on square waves is expected;
-    the aligned figure separates it from genuine amplitude disagreement)."""
-    t_lo, t_hi = max(t_ref[0], t_new[0]), min(t_ref[-1], t_new[-1])
+    """Pointwise (optionally best-shift) L2 comparison on the ref grid."""
+    t_lo = max(t_ref[0], t_new[0])
+    t_hi = min(t_ref[-1], t_new[-1])
     if t_hi <= t_lo:
         raise StageError("compare:overlap", "no time overlap between outputs")
     tq = [x for x in t_ref if t_lo <= x <= t_hi][:: max(1, len(t_ref) // 2000)]
     vr = _interp(tq, t_ref, v_ref)
 
-    def _raw(shift):
+    def raw(shift):
         vn = _interp([x + shift for x in tq], t_new, v_new)
         num = sum((a - b) ** 2 for a, b in zip(vr, vn)) ** 0.5
         den = sum(a ** 2 for a in vr) ** 0.5 or 1e-30
@@ -180,54 +179,151 @@ def compare_waveforms(t_ref, v_ref, t_new, v_new,
         mx = max(abs(a - b) for a, b in zip(vr, vn)) / span
         return num / den, mx
 
-    l20, mx0 = _raw(0.0)
-    res = {"l2rel": l20, "maxrel_span": mx0, "points": len(tq),
-           "window": [t_lo, t_hi], "skew_s": 0.0}
+    l20, mx0 = raw(0.0)
+    res = {"l2rel": l20, "maxrel_span": mx0, "skew_s": 0.0}
     if max_skew > 0:
-        nsteps = 41
         best = (l20, 0.0)
-        step = 2 * max_skew / nsteps
+        nsteps, step = 41, 2 * max_skew / 41
         for k in range(-nsteps // 2, nsteps // 2 + 1):
             tau = k * step
             if tau == 0.0:
                 continue
-            l2t, _ = _raw(tau)
+            l2t, _ = raw(tau)
             if l2t < best[0]:
                 best = (l2t, tau)
-        res["l2rel"] = round(best[0], 6)
-        res["skew_s"] = best[1]
+        res["l2rel"], res["skew_s"] = round(best[0], 6), best[1]
     return res
+
+
+def _crossings(t: list[float], v: list[float], vth: float) -> list[float]:
+    out = []
+    for i in range(1, len(v)):
+        a, b = v[i - 1], v[i]
+        if b != a and ((a < vth <= b) or (a > vth >= b)):
+            out.append(t[i - 1] + (vth - a) * (t[i] - t[i - 1]) / (b - a))
+    return out
+
+
+def _movavg(v: list[float], w: int) -> list[float]:
+    if w <= 1:
+        return v[:]
+    out, acc, q = [], 0.0, deque()
+    for x in v:
+        q.append(x)
+        acc += x
+        if len(q) > w:
+            acc -= q.popleft()
+        out.append(acc / len(q))
+    return out
+
+
+def compare_digital(t_ref, v_ref, t_new, v_new, vth: float,
+                    max_median_skew: float, max_edge_skew: float,
+                    amp_tol: float = 0.05) -> dict:
+    """Edge-count equality + per-edge skew bounds + swing match."""
+    er = [e for e in _crossings(t_ref, v_ref, vth)]
+    en = [e for e in _crossings(t_new, v_new, vth)]
+    lo = max(min(er) if er else 0, min(en) if en else 0)
+    hi = min(max(t_ref), max(t_new))
+    er_w = [e for e in er if lo <= e <= hi]
+    en_w = [e for e in en if lo <= e <= hi]
+    skews = [min(abs(e - x) for x in en_w) if en_w else float("inf")
+             for e in er_w]
+    med = sorted(skews)[len(skews) // 2] if skews else float("inf")
+    mx = max(skews) if skews else float("inf")
+    span_r = max(v_ref) - min(v_ref)
+    span_n = max(v_new) - min(v_new)
+    amp_ok = abs(span_r - span_n) <= amp_tol * max(span_r, 1e-9)
+    count_ok = len(er_w) == len(en_w)
+    ok = count_ok and med <= max_median_skew and mx <= max_edge_skew and amp_ok
+    return {"edges_ref": len(er_w), "edges_new": len(en_w),
+            "count_ok": bool(count_ok), "median_skew_s": med,
+            "max_skew_s": mx, "amp_ok": bool(amp_ok), "ok": bool(ok)}
+
+
+def compare_smoothed(t_ref, v_ref, t_new, v_new, bin_s: float,
+                     l2_tol: float) -> dict:
+    """Smoothed L2 (for switching currents whose spikes shift sub-ns)."""
+    dt = max(t_ref[1] - t_ref[0], 1e-15)
+    w = max(3, int(bin_s / dt) | 1)
+    m = compare_waveforms(t_ref, _movavg(v_ref, w), t_new, _movavg(v_new, w))
+    den = sum(abs(x) for x in _movavg(v_ref, w)) / max(len(v_ref), 1) or 1e-30
+    tq = [x for x in t_ref if max(t_new[0], t_ref[0]) <= x <= min(t_ref[-1], t_new[-1])]
+    vn = _interp(tq, t_new, _movavg(v_new, w))
+    vr = _interp(tq, t_ref, _movavg(v_ref, w))
+    l2 = sum((a - b) ** 2 for a, b in zip(vr, vn)) ** 0.5 / (den * len(tq) ** 0.5)
+    ok = bool(l2 <= l2_tol)
+    return {"l2rel": round(l2, 6), "maxrel_span": m["maxrel_span"], "ok": ok}
+
+
+
+def compare_supply(t_ref, v_ref, t_new, v_new, t_ss_frac: float = 0.33,
+                   mean_tol: float = 0.02, env_tol: float = 0.25) -> dict:
+    """Supply-rail agreement: steady-state MEAN current (the CACE spec
+    quantity) within mean_tol; peak envelope within env_tol. Spike-by-spike
+    alignment is explicitly not required."""
+    t0_r = t_ref[0] + (t_ref[-1] - t_ref[0]) * t_ss_frac
+    t0_n = t_new[0] + (t_new[-1] - t_new[0]) * t_ss_frac
+    mr = statistics.fmean(y for x, y in zip(t_ref, v_ref) if x >= t0_r)
+    mn = statistics.fmean(y for x, y in zip(t_new, v_new) if x >= t0_n)
+    mean_rel = abs(mr - mn) / max(abs(mr), 1e-12)
+    env_r = (min(v_ref), max(v_ref))
+    env_n = (min(v_new), max(v_new))
+    env_dev = max(abs(a - b) for a, b in zip(env_r, env_n)) \
+        / max(abs(env_r[1] - env_r[0]), 1e-12)
+    ok = bool(mean_rel <= mean_tol and env_dev <= env_tol)
+    return {"mean_ref_a": mr, "mean_new_a": mn, "mean_rel": round(mean_rel, 6),
+            "envelope_dev": round(env_dev, 4), "ok": ok}
+
+def compare_digital(t_ref, v_ref, t_new, v_new, vth: float,
+                    max_median_skew: float, max_edge_skew: float,
+                    amp_tol: float = 0.05,
+                    edge_margin_s: float = 1e-9) -> dict:
+    """Edge-count equality (interior window; +/-1 at boundaries allowed)
+    + per-edge skew bounds + swing match."""
+    er_all = _crossings(t_ref, v_ref, vth)
+    en_all = _crossings(t_new, v_new, vth)
+    lo = max(min(t_ref), min(t_new)) + edge_margin_s
+    hi = min(max(t_ref), max(t_new)) - edge_margin_s
+    er_w = [e for e in er_all if lo <= e <= hi]
+    en_w = [e for e in en_all if lo <= e <= hi]
+    n_r, n_n = len(er_w), len(en_w)
+    # match each reference edge to its nearest new edge
+    skews = [min(abs(e - x) for x in en_w) if en_w else float("inf")
+             for e in er_w]
+    med = sorted(skews)[len(skews) // 2] if skews else float("inf")
+    mx = max(skews) if skews else float("inf")
+    span_r = max(v_ref) - min(v_ref)
+    span_n = max(v_new) - min(v_new)
+    amp_ok = abs(span_r - span_n) <= amp_tol * max(span_r, 1e-9)
+    count_ok = abs(n_r - n_n) <= 1
+    ok = count_ok and med <= max_median_skew and mx <= max_edge_skew and amp_ok
+    return {"edges_ref": n_r, "edges_new": n_n,
+            "count_ok": bool(count_ok), "median_skew_s": med,
+            "max_skew_s": mx, "amp_ok": bool(amp_ok), "ok": bool(ok)}
+
 
 # ------------------------------------------------------------ runners
 def _container_path(p: Path) -> str:
-    """Host LinHT-rfic path -> container mount (/foss/designs/LinHT_IC)."""
     host_repo = str((REPO_ROOT.parent / "LinHT-rfic").resolve())
     s = str(Path(p).resolve())
-    if s.startswith(host_repo):
-        return "/foss/designs/LinHT_IC" + s[len(host_repo):]
-    return s
+    return "/foss/designs/LinHT_IC" + s[len(host_repo):] \
+        if s.startswith(host_repo) else s
 
 
 def run_ngspice_reference(tb: Path, timeout: float = 900) -> Path:
-    """Run the untouched TB in the container; returns local CSV copy.
-    Single round trip: simulate, verify wrdata, and cat it back."""
+    """Untouched TB in the container; single round trip returns local CSV."""
     cdir = _container_path(tb.parent)
     m = re.search(r"(?:^|\n)\s*wrdata\s+(\S+)", tb.read_text(), re.I)
     csv_name = m.group(1) if m else tb.stem + "_run.csv"
-    rc, out = container_exec(
-        f"cd '{cdir}' && PDK_ROOT=/foss/pdks "
-        "/foss/tools/ngspice/bin/ngspice -b '" + tb.name + "' "
-        "> /tmp/ng.log 2>&1; RC=$?; echo NGRC=$RC; "
-        f"if [ -s '{csv_name}' ]; then echo WRDATA_OK; cat '{csv_name}'; "
-        "else tail -20 /tmp/ng.log; fi", timeout=timeout)
+    cmd = (f"cd '{cdir}' && PDK_ROOT=/foss/pdks "
+           "/foss/tools/ngspice/bin/ngspice -b '" + tb.name + "' "
+           "> /tmp/ng.log 2>&1; RC=$?; echo NGRC=$RC; "
+           f"if [ -s '{csv_name}' ]; then echo WRDATA_OK; cat '{csv_name}'; "
+           "else tail -20 /tmp/ng.log; ls -la; fi")
+    rc, out = container_exec(cmd, timeout=timeout)
     if "NGRC=0" not in out or "WRDATA_OK" not in out:
-        # one retry; transient container/profile flakes observed once
-        rc, out = container_exec(
-            f"cd '{cdir}' && PDK_ROOT=/foss/pdks "
-            "/foss/tools/ngspice/bin/ngspice -b '" + tb.name + "' "
-            "> /tmp/ng.log 2>&1; RC=$?; echo NGRC=$RC; "
-            f"if [ -s '{csv_name}' ]; then echo WRDATA_OK; cat '{csv_name}'; "
-            "else tail -20 /tmp/ng.log; ls -la; fi", timeout=timeout)
+        rc, out = container_exec(cmd, timeout=timeout)  # one retry (flaked once)
     if "NGRC=0" not in out or "WRDATA_OK" not in out:
         raise StageError("run:ngspice", out[-400:])
     data = out.split("WRDATA_OK", 1)[1]
@@ -238,16 +334,17 @@ def run_ngspice_reference(tb: Path, timeout: float = 900) -> Path:
 
 def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
                      timeout_s: int = 1500) -> dict:
-    """Stage dir -> VM, hpeesofsim detached, poll, dsdump, pull text+log."""
+    """Stage dir -> VM; hpeesofsim detached via fire-and-forget ssh; poll;
+    dsdump (retry once — crashed once on a 45 MB dataset); pull text+log."""
     remote_dir = f"{VM_WORKROOT}/{case}"
     tarball = Path("/tmp") / f"{case}_stage.tgz"
     with tarfile.open(tarball, "w:gz") as tf:
         for p in staging.iterdir():
             tf.add(p, arcname=p.name)
     vm_ssh(f"mkdir -p {remote_dir}", check=True)
-    cmd = ["sshpass", "-p", _vm_pass(), "ssh", "-o", "StrictHostKeyChecking=no",
-           "-o", "UserKnownHostsFile=/dev/null", "-p", "2222",
-           "rakesh@127.0.0.1",
+    cmd = ["sshpass", "-p", _vm_pass(), "ssh", "-o",
+           "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+           "-p", "2222", "rakesh@127.0.0.1",
            f"cat > {remote_dir}/in.tgz && cd {remote_dir} && "
            "tar xzf in.tgz && rm in.tgz"]
     proc = subprocess.run(cmd, input=tarball.read_bytes(), capture_output=True,
@@ -257,9 +354,9 @@ def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
                          (proc.stderr or b"?").decode(errors="replace")[-300:])
     netlist = next(staging.glob("ads_*.net")).name
     stem = netlist[len("ads_"):-len(".net")]
-    # fire-and-forget: ssh is NEVER waited (a backgrounded remote child can
-    # hold the channel open); the poll loop below tracks real progress.
-    launcher = subprocess.Popen(
+    # fire-and-forget launch: never waited (backgrounded remote child can
+    # hold the channel open); the poll loop tracks real progress.
+    subprocess.Popen(
         ["sshpass", "-p", _vm_pass(), "ssh", "-o",
          "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
          "-p", "2222", "rakesh@127.0.0.1",
@@ -270,7 +367,7 @@ def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
          "</dev/null > /dev/null 2>&1 & echo STARTED"],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         stdin=subprocess.DEVNULL)
-    time.sleep(3)
+    time.sleep(5)
     tail, done = "", False
     t0 = time.time()
     while time.time() - t0 < timeout_s:
@@ -279,15 +376,18 @@ def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
             f"cd {remote_dir} && "
             "if [ -s dataset.txt ] && grep -q 'Simulation finished' sim.log; "
             "then echo DONE_OK; fi; "
-            "grep -m1 'terminated due to an error' sim.log || true")
+            "grep -m1 'terminated due to an error\\|crash report' sim.log || true")
         if "DONE_OK" in tail:
             done = True
             break
-        if "terminated due to an error" in tail:
+        if "terminated due to an error" in tail or "crash report" in tail:
             _, why = vm_ssh(f"cd {remote_dir} && grep -i -B2 -A4 -m2 error sim.log")
             raise StageError("run:hpeesofsim", why or tail)
+        if "-s dataset.txt" in tail and "DONE_OK" not in tail and \
+                time.time() - t0 > 300:
+            pass  # keep polling; dsdump may take tens of seconds
     if not done:
-        raise StageError("run:hpeesofsim", f"incomplete: {tail}")
+        raise StageError("run:hpeesofsim", f"incomplete after {timeout_s}s: {tail}")
     outdir = EVIDENCE / "logs"
     outdir.mkdir(parents=True, exist_ok=True)
     dataset = vm_pull(f"{remote_dir}/dataset.txt").decode(errors="replace")
@@ -308,30 +408,35 @@ def xcheck_ads(case: str, tb: Path, corner: str, params: dict,
     csv = run_ngspice_reference(tb)
     lines = csv.read_text().splitlines()
     order = wrdata_signal_order(tb.read_text())
-    ref = {}
-    for s in signals:
-        ngname = DEFAULT_SIGNALS[s]["ng"]
-        if ngname not in order:
-            raise StageError("parse:ngspice-column",
-                             f"{ngname} not in wrdata order {order}")
-        ref[s] = parse_ngspice_csv(lines, order.index(ngname))
-
     data = parse_ads_dataset(Path(artifacts["dataset"]).read_text())
-    l2max = float(tol.get("l2rel", 0.05))
-    mxmax = float(tol.get("maxrel_span", 0.10))
+
+    dig = tol.get("digital", {})
+    sup = tol.get("supply", {})
     metrics, verdict = {}, True
+    def ref_pair(s):
+        return parse_ngspice_csv(lines, order.index(DEFAULT_SIGNALS[s]["ng"]))
+
     for s in signals:
         ads_name = DEFAULT_SIGNALS[s]["ads"]
         if ads_name not in data:
             raise StageError("parse:ads-vector",
                              f"{ads_name} not in dataset vars {list(data)}")
         new = (data["time"], data[ads_name])
-        m = compare_waveforms(ref[s][0], ref[s][1], new[0], new[1],
-                              max_skew=float(tol.get("max_skew_s", 0)))
-        ok = (m["l2rel"] <= l2max
-              and abs(m.get("skew_s", 0.0)) <= float(tol.get("max_skew_s", 0)))
+        if s.startswith("i_"):
+            m = compare_supply(*ref_pair(s), new[0], new[1],
+                               mean_tol=float(sup.get("mean_tol", 0.02)),
+                               env_tol=float(sup.get("env_tol", 0.25)))
+            kind = "supply"
+        else:
+            m = compare_digital(*ref_pair(s), new[0], new[1],
+                                vth=float(dig.get("vth_v", 0.75)),
+                                max_median_skew=float(dig.get("median_skew_s", 1e-10)),
+                                max_edge_skew=float(dig.get("max_skew_s", 5e-10)))
+            kind = "edges"
+        ok = bool(m.get("ok"))
         verdict &= ok
-        metrics[s] = {"metrics": m, "ok": bool(ok)}
+        metrics[s] = {"kind": kind, "metrics": m, "ok": ok}
+
     return {"case": case, "corner": corner, "params": params,
             "reference": {"tool": "ngspice", "deck": str(tb)},
             "crosscheck": {"tool": "hpeesofsim",
@@ -342,57 +447,43 @@ def xcheck_ads(case: str, tb: Path, corner: str, params: dict,
 # ------------------------------------------------------------ self test
 DS_FIXTURE = '''* Vectorset name: "Tran1.TRAN"
     0: "time" 0 r
+	number of attributes: 1
+	    "flags" = "time type=real indep=yes"
     1: "lo_i" 0 r
-    2: "Vdd.i" 0 r
+	number of attributes: 1
+	    "flags" = "voltage type=real indep=no"
 ----------
-* Number of points: 2
+* Number of points: 3
 0: 0
 0
-0.001
-1
-1: 5e-11
-1
-0.002
-2'''
+1: 1e-9
+0.5
+2: 2e-9
+1.5'''
 
 
 def self_test() -> int:
-    """Exercise parsers + comparator with synthetic data (no tools)."""
     t = [i * 1e-12 for i in range(100)]
     a = [((i % 10) - 5) / 5 for i in range(100)]
     b = [x * 1.01 for x in a]
-    m = compare_waveforms(t, a, t, b)
-    assert m["l2rel"] < 0.02 and m["maxrel_span"] < 0.05, m
-    m2 = compare_waveforms(t, a, t, [-x for x in a])
-    assert m2["l2rel"] > 1.0
+    m = compare_waveforms(t, a, t, b, max_skew=0)
+    assert m["l2rel"] < 0.02, m
 
-    csv = ("0 0 0 1.5\n"
-           "5e-10 0.25 0 1.5\n"
-           "1e-9 0.5 0 1.5\n")
-    tv, vals = parse_ngspice_csv(csv.splitlines(), 0)
-    assert tv == [0.0, 5e-10, 1e-9] and vals == [0.0, 0.25, 0.5], (tv, vals)
-    tq, vq = parse_ngspice_csv(csv.splitlines(), 1)
-    assert vq == [1.5, 1.5, 1.5]
+    # square wave with 50ps edge skew -> aligned comparator must find it
+    sq_t = [i * 1e-12 for i in range(4000)]
+    sq = [1.5 if (i // 500) % 2 == 0 else 0.0 for i in range(4000)]
+    shifted = [1.5 if ((i - 50) // 500) % 2 == 0 else 0.0 for i in range(4000)]
+    d = compare_digital(sq_t, sq, sq_t, shifted, vth=0.75,
+                        max_median_skew=1e-10, max_edge_skew=5e-10)
+    assert d["count_ok"] and d["median_skew_s"] <= 1e-10 and d["ok"], d
 
     got = parse_ads_dataset(DS_FIXTURE)
-    assert got["time"] == [0.0, 5e-11], got
-    assert got["lo_i"] == [0.0, 1.0] and got["Vdd.i"] == [0.001, 0.002]
+    assert got["time"] == [0.0, 1e-9, 2e-9], got
+    assert got["lo_i"] == [0.0, 0.5, 1.5], got
 
-    psf = """
-VALUE
-( 0.0 "time"
-  ( 0.0 "lo_i" )
-  ( 1.5 "clk_vco_div" )
-)
-( 1.0e-9 "time"
-  ( 0.5 "lo_i" )
-  ( 1.2 "clk_vco_div" )
-)
-"""
-    tmp = Path("/tmp/xcheck_psf.psf")
-    tmp.write_text(psf)
-    got = parse_psfascii(tmp, ["lo_i"])
-    assert got["lo_i"] == ([0.0, 1e-9], [0.0, 0.5]), got
+    csv = ("0 0 0 1.5\n5e-10 0.25 0 1.5\n1e-9 0.5 0 1.5\n")
+    tv, vals = parse_ngspice_csv(csv.splitlines(), 0)
+    assert tv == [0.0, 5e-10, 1e-9] and vals == [0.0, 0.25, 0.5]
 
     print(json.dumps({"self_test": "pass"}, indent=2))
     return 0
