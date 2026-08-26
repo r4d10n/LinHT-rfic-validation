@@ -115,9 +115,13 @@ under `spectre` SPICE-language mode + psp103va.osdi (module compiled via
 IHP openvaf recipe; registered by osdi FILE BASENAME — psp103va.va builds
 module psp103va matching the lib token). Blockers measured: $PDK_ROOT env
 paths unexpanded (use absolute), .control blocks rejected (strip; metrics
-are host-side anyway), {brace} expressions need rewriting. Both routes are
-1-2 focused sessions from closure; all dialect facts above already encoded
-in harness/netadapt.py.
+are host-side anyway), {brace} expressions need rewriting. ROUTE B STATUS: blocked at the PDK libraries themselves — resistors_mod.lib
+uses ngspice-only constructs (`agauss` MC distributions, inline brace exprs)
+that spectre SPICE-mode cannot parse (SFE-874/841 on 48+ lines). Rewriting
+PDK libs for spectre is exactly the job Route A's behavioral wrappers
+already do ⇒ Route A is the correct path; its stage-A quiescence probe
+(OP comparison of tail/drain nodes vs ngspice) is the sole remaining W2
+debug step. All dialect facts above already encoded in harness/netadapt.py.
 2. W4 LVS skeleton (Calibre LVS needs a device extraction deck — bigger
    transcription than DRC subset).
 3. W5 Virtuoso stream-in audit.
