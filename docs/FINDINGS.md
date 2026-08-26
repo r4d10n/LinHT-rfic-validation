@@ -88,6 +88,18 @@ Solved empirically en route: title-line-as-instance in included files,
 `.spc` extension = compiled-table reader (use `.scs`), `parameters` inside
 subckt bodies, model-scope geometry expressions, `sinedc` vs `dc`,
 native `psp103` shadowed by ahdl_include of the VA.
+ROOT CAUSE FOUND & REMEDY VALIDATED (2026-08-26 late): Spectre's NATIVE
+`psp103` primitive mis-scales these VA-derived cards — identical device
+(W=16u L=0.5u NF=4, Vgs=1.0 Vds=1.5) gives Id = **153 mA** native vs
+**2.73 mA** ngspice/OpenVAF vs **3.23 mA** spectre direct-VA-instance.
+CORRECT ROUTE: `ahdl_include "psp103.va"` + instantiate module
+`PSP103VA` directly per wrapper instance with the FULL card parameter set
+injected as instance params (expressions referencing w/l/ng/pre_layout are
+legal there; corner globals supply pre_layout etc).
+IMPLEMENTATION STATUS: recipe validated by probe; production refactor of
+gen_spectre_bundle deferred to next session (mechanical: parse card dict,
+emit per-instance params; ~1h).
+
 CURRENT BLOCKER (narrowed substantially): tran completes 0 errors / 28 s.
 Verified working in psf: sine drive swings (vco_p span 0.4 V), rst_n pulse,
 coupling cap conducts (dut.ccinp.x span 0.4 V), first-stage gate dut.ckAp
