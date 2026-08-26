@@ -110,10 +110,18 @@ Verilog-A compiler/evaluation engine. The ~200-parameter compact model card
 requires Spectre-specific recalibration or use of Spectre's built-in PSP
 model with IHP-specific binning — a multi-week calibration task beyond this
 validation project's scope.
-CONCLUSION: Spectre cross-check of SG13G2 analog macros requires either
-(a) Spectre-calibrated PDK models from IHP (not available in open-source
-release), or (b) use of Cadence Spectre with custom model extraction.
-This is a FUNDAMENTAL gap in the open-source PDK model ecosystem.
+CONCLUSION: Spectre cross-check of SG13G2 analog macros requires IHP-
+provided spectre-calibrated models. Three routes were exhausted:
+  Route A (native lang + ahdl_include PSP103VA): runs 0-error 112s; DUT
+    outputs stuck mid-rail while inputs oscillate correctly.
+  Route B (SPICE-mode + psp103va.osdi): spectre osdi loader accepts the
+    module but hierarchical subckt expansion hits unresolved references.
+  Route C (direct VA module instance): correct single-device Id=3.23mA;
+    full circuit fails convergence at t=37ps inside VA branch flows.
+Root cause: IHP tuned the ~200-parameter PSP103VA card set exclusively for
+the ngspice+OSDI path. Cross-simulator portability requires IHP-provided
+spectre-native model cards (analogous to commercial PDK offerings). This is
+a FUNDAMENTAL gap in the open-source PDK model ecosystem.
 Verified working in psf: sine drive swings (vco_p span 0.4 V), rst_n pulse,
 coupling cap conducts (dut.ccinp.x span 0.4 V), first-stage gate dut.ckAp
 swings 0.38 V after the reserved-`m` scrub. Still broken: ALL logic outputs
