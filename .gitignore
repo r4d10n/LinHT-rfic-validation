@@ -4,3 +4,4 @@ __pycache__/
 evidence/logs/*.tmp
 *_run/
 work/
+.jspace/
