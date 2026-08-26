@@ -304,10 +304,13 @@ def compare_digital(t_ref, v_ref, t_new, v_new, vth: float,
 
 
 # ------------------------------------------------------------ runners
+CONTAINER_REPO = "/foss/designs/LinHT-rfic"  # recreated 2026-08-26 mount
+
+
 def _container_path(p: Path) -> str:
     host_repo = str((REPO_ROOT.parent / "LinHT-rfic").resolve())
     s = str(Path(p).resolve())
-    return "/foss/designs/LinHT_IC" + s[len(host_repo):] \
+    return CONTAINER_REPO + s[len(host_repo):] \
         if s.startswith(host_repo) else s
 
 
@@ -363,7 +366,8 @@ def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
          f"cd {remote_dir} && chmod +x adsenv.sh && "
          "nohup sh -c '. ./adsenv.sh && "
          f"hpeesofsim -n {netlist} > sim.log 2>&1 && "
-         f"dsdump {stem}.ds > dataset.txt' "
+         "dsdump linht_xcheck.ds > dataset.txt && "
+         "echo DSDUMP_DONE >> dataset.txt' "
          "</dev/null > /dev/null 2>&1 & echo STARTED"],
         stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
         stdin=subprocess.DEVNULL)
@@ -374,7 +378,7 @@ def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
         time.sleep(poll_sec)
         _, tail = vm_ssh(
             f"cd {remote_dir} && "
-            "if [ -s dataset.txt ] && grep -q 'Simulation finished' sim.log; "
+            "if grep -q DSDUMP_DONE dataset.txt 2>/dev/null && grep -q 'Simulation finished' sim.log; "
             "then echo DONE_OK; fi; "
             "grep -m1 'terminated due to an error\\|crash report' sim.log || true")
         if "DONE_OK" in tail:
@@ -399,6 +403,64 @@ def push_and_run_ads(staging: Path, case: str, poll_sec: int = 15,
 
 
 # ------------------------------------------------------------ case driver
+def push_and_run_spectre(staging: Path, case: str, poll_sec: int = 10,
+                         timeout_s: int = 1200) -> dict:
+    """Stage dir -> VM; spectre detached; psfascii output pulled back."""
+    remote_dir = f"{VM_WORKROOT}/{case}_spc"
+    tarball = Path("/tmp") / f"{case}_spc_stage.tgz"
+    with tarfile.open(tarball, "w:gz") as tf:
+        for p in staging.iterdir():
+            tf.add(p, arcname=p.name)
+    vm_ssh(f"mkdir -p {remote_dir}", check=True)
+    cmd = ["sshpass", "-p", _vm_pass(), "ssh", "-o",
+           "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+           "-p", "2222", "rakesh@127.0.0.1",
+           f"cat > {remote_dir}/in.tgz && cd {remote_dir} && "
+           "tar xzf in.tgz && rm in.tgz"]
+    proc = subprocess.run(cmd, input=tarball.read_bytes(), capture_output=True,
+                          timeout=180)
+    if proc.returncode != 0:
+        raise StageError("transfer:vm-push",
+                         (proc.stderr or b"?").decode(errors="replace")[-300:])
+    netlist = next(staging.glob("spc_*.net")).name
+    subprocess.Popen(
+        ["sshpass", "-p", _vm_pass(), "ssh", "-o",
+         "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
+         "-p", "2222", "rakesh@127.0.0.1",
+         f"cd {remote_dir} && export PATH=/opt/cadence/installs/SPECTRE251/bin:$PATH && "
+         "nohup sh -c 'spectre " + netlist +
+         " -format psfascii -raw psf > sim.log 2>&1' "
+         "</dev/null > /dev/null 2>&1 & echo GO"],
+        stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+        stdin=subprocess.DEVNULL)
+    time.sleep(5)
+    t0 = time.time()
+    tail = ""
+    while time.time() - t0 < timeout_s:
+        time.sleep(poll_sec)
+        _, tail = vm_ssh(
+            f"cd {remote_dir} && ls psf/*.psf >/dev/null 2>&1 && "
+            "grep -q 'completed' sim.log && echo SPC_DONE || true")
+        if "SPC_DONE" in tail:
+            break
+        _, errs = vm_ssh(f"cd {remote_dir} && grep -c ERROR sim.log || true")
+        if errs.strip().isdigit() and int(errs) > 0 and \
+                time.time() - t0 > 60:
+            raise StageError("run:spectre",
+                             vm_ssh(f"cd {remote_dir} && grep -m3 -A3 ERROR sim.log")[1])
+    else:
+        raise StageError("run:spectre", f"incomplete: {tail}")
+    outdir = EVIDENCE / "logs"
+    outdir.mkdir(parents=True, exist_ok=True)
+    psf_name = vm_ssh(f"cd {remote_dir} && ls psf/")[1].split()[0]
+    blob = vm_pull(f"{remote_dir}/psf/{psf_name}")
+    (outdir / f"{case}_spectre.psfascii").write_bytes(blob)
+    log = vm_ssh(f"cat {remote_dir}/sim.log")[1] + "\n"
+    (outdir / f"{case}_spectre.sim.log").write_text(log)
+    return {"psf": outdir / f"{case}_spectre.psfascii",
+            "log": outdir / f"{case}_spectre.sim.log"}
+
+
 def xcheck_ads(case: str, tb: Path, corner: str, params: dict,
                signals: list[str], tol: dict) -> dict:
     staging = Path("/tmp/xcheck") / f"{case}_ads"
@@ -440,6 +502,45 @@ def xcheck_ads(case: str, tb: Path, corner: str, params: dict,
     return {"case": case, "corner": corner, "params": params,
             "reference": {"tool": "ngspice", "deck": str(tb)},
             "crosscheck": {"tool": "hpeesofsim",
+                           "log": str(artifacts["log"])},
+            "signals": metrics, "verdict": "PASS" if verdict else "FAIL"}
+
+
+def xcheck_spectre(case: str, tb: Path, corner: str, params: dict,
+                   signals: list[str], tol: dict) -> dict:
+    staging = Path("/tmp/xcheck") / f"{case}_spc"
+    adapt(tb, "spectre", corner, staging, params)
+    artifacts = push_and_run_spectre(staging, case)
+
+    csv = run_ngspice_reference(tb)
+    lines = csv.read_text().splitlines()
+    order = wrdata_signal_order(tb.read_text())
+    data_ps = Path(artifacts["psf"])
+    dig = tol.get("digital", {})
+    sup = tol.get("supply", {})
+    metrics, verdict = {}, True
+    for s in signals:
+        spec_name = DEFAULT_SIGNALS[s]["spectre"]
+        ref = parse_ngspice_csv(lines, order.index(DEFAULT_SIGNALS[s]["ng"]))
+        parsed = parse_psfascii(data_ps, [spec_name])
+        new = parsed[spec_name]
+        if s.startswith("i_"):
+            m = compare_supply(*ref, new[0], new[1],
+                               mean_tol=float(sup.get("mean_tol", 0.02)),
+                               env_tol=float(sup.get("env_tol", 0.25)))
+            kind = "supply"
+        else:
+            m = compare_digital(*ref, new[0], new[1],
+                                vth=float(dig.get("vth_v", 0.75)),
+                                max_median_skew=float(dig.get("median_skew_s", 1e-10)),
+                                max_edge_skew=float(dig.get("max_skew_s", 5e-10)))
+            kind = "edges"
+        ok = bool(m.get("ok"))
+        verdict &= ok
+        metrics[s] = {"kind": kind, "metrics": m, "ok": ok}
+    return {"case": case, "corner": corner, "params": params,
+            "reference": {"tool": "ngspice", "deck": str(tb)},
+            "crosscheck": {"tool": "spectre",
                            "log": str(artifacts["log"])},
             "signals": metrics, "verdict": "PASS" if verdict else "FAIL"}
 
@@ -497,6 +598,7 @@ def main() -> int:
     ap.add_argument("--corner", default="tt")
     ap.add_argument("--param", action="append", default=[])
     ap.add_argument("--signal", action="append", default=None)
+    ap.add_argument("--target", choices=["ads", "spectre"], default="ads")
     args = ap.parse_args()
     if args.self_test:
         return self_test()
@@ -509,10 +611,14 @@ def main() -> int:
     params.update(dict(kv.split("=", 1) for kv in args.param))
     tb = args.tb or (REPO_ROOT.parent / "LinHT-rfic" / case_cfg["tb"])
 
-    rep = xcheck_ads(args.case, tb, args.corner, params, signals,
-                     cfg.get("transient", {}))
+    if args.target == "ads":
+        rep = xcheck_ads(args.case, tb, args.corner, params, signals,
+                         cfg.get("transient", {}))
+    else:
+        rep = xcheck_spectre(args.case, tb, args.corner, params, signals,
+                             cfg.get("transient", {}))
     EVIDENCE.mkdir(exist_ok=True)
-    outfile = EVIDENCE / f"{args.case}_{args.corner}_ads_report.json"
+    outfile = EVIDENCE / f"{args.case}_{args.corner}_{args.target}_report.json"
     outfile.write_text(json.dumps(rep, indent=2))
     print(json.dumps({"report": str(outfile), "verdict": rep["verdict"]}))
     return 0 if rep["verdict"] == "PASS" else 1

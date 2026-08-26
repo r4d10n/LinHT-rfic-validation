@@ -136,6 +136,16 @@ def stage_circuit_files(files: list[Path], staging: Path) -> list[str]:
     return names
 
 
+def rename_staged_for_spectre(staging: Path, names: list[str]) -> list[str]:
+    """Spectre reads file language from extension: .spice would force spice."""
+    out = []
+    for n in names:
+        src, dst = staging / n, staging / (n + ".spc")
+        src.rename(dst)
+        out.append(dst.name)
+    return out
+
+
 # ------------------------------------------------------- corner expansion
 def lib_section(path: Path, section: str) -> list[tuple[str, str]]:
     text = path.read_text(errors="replace")
@@ -213,13 +223,19 @@ def translate_staged(text: str, target: str) -> str:
                 out.append(debrace(head))
                 if params:
                     out.append("parameters " + debrace(" ".join(params)))
-            else:  # spectre keeps .-less subckt form
-                out.append(f"subckt {toks[1]} ({' '.join(pins)}) "
-                           + (f"parameters {debrace(' '.join(params))}" if params else "").rstrip())
+            else:
+                # spectre form (verified on samjna): nodes bare, then a body
+                # `parameters` line; no parens, no keyword on the header.
+                out.append(f"subckt {toks[1]} {' '.join(pins)}")
+                if params:
+                    out.append("parameters " + debrace(" ".join(params)))
             continue
         if low.startswith(".ends"):
             name = s.split()[1] if len(s.split()) > 1 else ""
             out.append(f"end {name}".strip() if target == "ads" else f"ends {name}".strip())
+            continue
+        if target == "spectre" and s.startswith("*"):
+            out.append("//" + s[1:])
             continue
         if target == "ads":
             if s.startswith("*"):
@@ -284,6 +300,47 @@ def translate_staged(text: str, target: str) -> str:
                 continue
             out.append(debrace(ln))
             continue
+        # ---- spectre branch element translation ----
+        ms = re.match(r"([Vv]\w+)\s+(\S+)\s+(\S+)\s+(.*)$", s)
+        if ms:
+            name, n1, n2, rest = ms.groups()
+            mp = re.match(r"dc\s+(\S+)\s+sin\((.*)\)\s*$", rest)
+            mpulse = re.match(r"pulse\((.*)\)\s*$", rest)
+            mpdc = re.match(r"dc\s+(\S+)\s*$", rest)
+            if mp:
+                vo, va, f_, td, th, ph = _split6(debrace(mp.group(2)))
+                sp = "" if ph.strip() in ("0", "") else \
+                    f" sinphase=({ph})*pi/180"
+                out.append(f"{name} {n1} {n2} vsource type=sine "
+                           f"dc={vo} ampl={va} freq={f_}{sp}")
+                continue
+            if mpulse:
+                a = debrace(mpulse.group(1)).split()
+                out.append(f"{name} {n1} {n2} vsource type=pulse "
+                           f"v1={a[0]} v2={a[1]} delay={a[2]} rise={a[3]} "
+                           f"fall={a[4]} width={a[5]} period={a[6]}")
+                continue
+            if mpdc:
+                out.append(f"{name} {n1} {n2} vsource type=dc dc={debrace(mpdc.group(1))}")
+                continue
+        mr = re.match(r"[Rr](\w+)\s+(\S+)\s+(\S+)\s+(\S+)$", s)
+        mc = re.match(r"[Cc](\w+)\s+(\S+)\s+(\S+)\s+(\S+)$", s)
+        mx = re.match(r"([Xx])(\S+)\s+(.*)$", s)
+        if mr and "=" not in mr.group(4):
+            out.append(debrace(f"{mr.group(1)} {mr.group(2)} {mr.group(3)} resistor r={mr.group(4)}"))
+            continue
+        if mc and "=" not in mc.group(4):
+            out.append(debrace(f"{mc.group(1)} {mc.group(2)} {mc.group(3)} capacitor c={mc.group(4)}"))
+            continue
+        if mx:
+            body = mx.group(3).split()
+            seen = False; nodes=[]; params=[]
+            for t in body:
+                if "=" in t or seen: seen=True; params.append(t)
+                else: nodes.append(t)
+            subname = nodes[-1]
+            out.append(debrace(f"{mx.group(2)} {' '.join(nodes[:-1])} {subname} {' '.join(params)}".rstrip()))
+            continue
         out.append(debrace(ln))
     if target == "ads":
         return "\n".join(_ads_safe(l) for l in out) + "\n"
@@ -319,58 +376,58 @@ def gen_ads(doc: dict, corner: str, extra_defs: list[str]) -> list[str]:
 
 
 _SPECTRE_WRAPPERS = """
-// IHP device wrappers, Spectre dialect. Formulas mirror ihp2ads.py (proven
-// against the PDK's own ngspice wrappers); junction areas computed inline.
-subckt sg13_lv_nmos (d g s b) parameters w=0.35e-6 l=0.34e-6 ng=1 m=1 trise=0 z1=0.34e-6 z2=0.38e-6 wmin=0.15e-6
-  wf=max(w/ng,wmin)
-  odd=(floor(floor(ng/2+0.501)*2+0.001) != ng)
-  as_o=wf*(z1+((ng-1)/2)*z2)
-  ps_o=2*(wf*((ng-1)/2+1)+z1+(ng-1)/2*z2)
-  as_e=wf*(2*z1+max(0,(ng-2)/2)*z2)
-  ad_e=wf*z2/2*ng
-  ps_e=2*(wf*(2+max(ng-2,0)/2)+2*z1+max(ng-2,0)/2*z2)
-  pd_e=(wf+z2)*ng
-  N1 (d g s b) sg13g2_lv_nmos_psp w=w l=l nf=ng mult=m \\
-     as=(odd ? as_o : as_e) ad=(odd ? as_o : ad_e) \\
-     ps=(odd ? ps_o : ps_e) pd=(odd ? ps_o : pd_e) \\
-     dta=trise ngcon=2 delvto=0 factuo=1
+// IHP device wrappers, Spectre dialect (grammar verified on samjna:
+// subckt NAME nodes... / body parameters line / ends NAME).
+subckt sg13_lv_nmos d g s b
+parameters w=0.35e-6 l=0.34e-6 ng=1 m=1 trise=0 z1=0.34e-6 z2=0.38e-6 wmin=0.15e-6
+  parameters wf=max(w/ng,wmin)
+  parameters odd=(floor(floor(ng/2+0.501)*2+0.001) != ng)
+  parameters as_o=wf*(z1+((ng-1)/2)*z2)
+  parameters ps_o=2*(wf*((ng-1)/2+1)+z1+(ng-1)/2*z2)
+  parameters as_e=wf*(2*z1+max(0,(ng-2)/2)*z2)
+  parameters ad_e=wf*z2/2*ng
+  parameters ps_e=2*(wf*(2+max(ng-2,0)/2)+2*z1+max(ng-2,0)/2*z2)
+  parameters pd_e=(wf+z2)*ng
+  N1 (d g s b) sg13g2_lv_nmos_psp w=w l=l nf=ng mult=m as=(odd ? as_o : as_e) ad=(odd ? as_o : ad_e) ps=(odd ? ps_o : ps_e) pd=(odd ? ps_o : pd_e) dta=trise ngcon=2 delvto=0 factuo=1
 ends sg13_lv_nmos
 
-subckt sg13_lv_pmos (d g s b) parameters w=0.35e-6 l=0.34e-6 ng=1 m=1 trise=0 z1=0.34e-6 z2=0.38e-6 wmin=0.15e-6
-  wf=max(w/ng,wmin)
-  odd=(floor(floor(ng/2+0.501)*2+0.001) != ng)
-  as_o=wf*(z1+((ng-1)/2)*z2)
-  ps_o=2*(wf*((ng-1)/2+1)+z1+(ng-1)/2*z2)
-  as_e=wf*(2*z1+max(0,(ng-2)/2)*z2)
-  ad_e=wf*z2/2*ng
-  ps_e=2*(wf*(2+max(ng-2,0)/2)+2*z1+max(ng-2,0)/2*z2)
-  pd_e=(wf+z2)*ng
-  N1 (d g s b) sg13g2_lv_pmos_psp w=w l=l nf=ng mult=m \\
-     as=(odd ? as_o : as_e) ad=(odd ? as_o : ad_e) \\
-     ps=(odd ? ps_o : ps_e) pd=(odd ? ps_o : pd_e) \\
-     dta=trise ngcon=2 delvto=0 factuo=1
+subckt sg13_lv_pmos d g s b
+parameters w=0.35e-6 l=0.34e-6 ng=1 m=1 trise=0 z1=0.34e-6 z2=0.38e-6 wmin=0.15e-6
+  parameters wf=max(w/ng,wmin)
+  parameters odd=(floor(floor(ng/2+0.501)*2+0.001) != ng)
+  parameters as_o=wf*(z1+((ng-1)/2)*z2)
+  parameters ps_o=2*(wf*((ng-1)/2+1)+z1+(ng-1)/2*z2)
+  parameters as_e=wf*(2*z1+max(0,(ng-2)/2)*z2)
+  parameters ad_e=wf*z2/2*ng
+  parameters ps_e=2*(wf*(2+max(ng-2,0)/2)+2*z1+max(ng-2,0)/2*z2)
+  parameters pd_e=(wf+z2)*ng
+  N1 (d g s b) sg13g2_lv_pmos_psp w=w l=l nf=ng mult=m as=(odd ? as_o : as_e) ad=(odd ? as_o : ad_e) ps=(odd ? ps_o : ps_e) pd=(odd ? ps_o : pd_e) dta=trise ngcon=2 delvto=0 factuo=1
 ends sg13_lv_pmos
 
-subckt rppd (p n bn) parameters w=0.5e-6 l=0.5e-6 m=1 b=0 ps=0.18e-6
-  weff=w+0.006e-6
-  rtot=(rsh_rppd*((b+1)*l+ps*b)/weff + 2*52*0.5e-6/weff)/m
+subckt rppd p n bn
+parameters w=0.5e-6 l=0.5e-6 m=1 b=0 ps=0.18e-6
+  parameters weff=w+0.006e-6
+  parameters rtot=(rsh_rppd*((b+1)*l+ps*b)/weff + 2*52*0.5e-6/weff)/m
   R1 (p n) resistor r=rtot tc1=0.000170 tc2=6.0e-7
 ends rppd
 
-subckt rhigh (p n bn) parameters w=0.5e-6 l=0.96e-6 m=1 b=0 ps=0.18e-6
-  weff=w-0.04e-6
-  rtot=(rsh_rhigh*((b+1)*l+ps*b)/weff + 2*55*0.5e-6/weff)/m
+subckt rhigh p n bn
+parameters w=0.5e-6 l=0.96e-6 m=1 b=0 ps=0.18e-6
+  parameters weff=w-0.04e-6
+  parameters rtot=(rsh_rhigh*((b+1)*l+ps*b)/weff + 2*55*0.5e-6/weff)/m
   R1 (p n) resistor r=rtot tc1=-0.002300 tc2=3.0e-6
 ends rhigh
 
-subckt rsil (p n bn) parameters w=0.5e-6 l=0.5e-6 m=1 b=0 ps=0.18e-6
-  weff=w+0.01e-6
-  rtot=(rsh_rsil*((b+1)*l+ps*b)/weff + 2*1.5*0.5e-6/weff)/m
+subckt rsil p n bn
+parameters w=0.5e-6 l=0.5e-6 m=1 b=0 ps=0.18e-6
+  parameters weff=w+0.01e-6
+  parameters rtot=(rsh_rsil*((b+1)*l+ps*b)/weff + 2*1.5*0.5e-6/weff)/m
   R1 (p n) resistor r=rtot tc1=0.003100 tc2=2.0e-7
 ends rsil
 
-subckt cap_cmim (p n) parameters w=7e-6 l=7e-6 m=1 mm_ok=0
-  ctot=(cap_carea*w*l + 40e-18*2*(w+l))*m
+subckt cap_cmim p n
+parameters w=7e-6 l=7e-6 m=1 mm_ok=0
+  parameters ctot=(cap_carea*w*l + 40e-18*2*(w+l))*m
   Rs (p x) resistor r=0.055/m
   C1 (x n) capacitor c=ctot
 ends cap_cmim
@@ -400,16 +457,44 @@ def _translate_model_card(line: str, va_module: str) -> str:
 
 def gen_spectre_bundle(corner: str, va_module_map: dict[str, str]) -> str:
     """Generate models_sg13g2_<corner>.spectre from vendored PDK libs."""
-    o = [f"// generated by netadapt.py --target spectre (corner {corner})",
-         'ahdl_include "psp103.va"', ""]
+    # NOTE: no ahdl_include — Spectre 25.1 has a native `psp103` primitive;
+    # including the VA shadowed it and broke initial setup (CMI-3078).
+    o = ["simulator lang=spectre", ""]
     g = corner_globals(corner)
-    if g:
-        o.append("parameters " + " ".join(f"{k}={v}" for k, v in g))
-        o.append("")
+    g.append(("pre_layout", "1"))
+    o.append("parameters " + " ".join(f"{k}={v}" for k, v in g))
+    o.append("")
     o.append(_SPECTRE_WRAPPERS)
     o.append("// ---- PSP103 VA model cards (from sg13g2_moslv_parm.lib) ----")
     parm = (PDK_REF / "sg13g2_moslv_parm.lib").read_text(errors="replace")
+    def _strip_geom(card: str) -> str:
+        """Remove geometry-dependent model params (balanced-paren aware;
+        spectre evaluates model-scope exprs without w/l/ng)."""
+        for key in ("iginvlw", "cfrw"):
+            while True:
+                i = card.find(key + "=")
+                if i < 0:
+                    break
+                j = card.find("(", i)
+                if j < 0:
+                    break
+                depth, k = 0, j
+                while k < len(card):
+                    if card[k] == "(":
+                        depth += 1
+                    elif card[k] == ")":
+                        depth -= 1
+                        if depth == 0:
+                            break
+                    k += 1
+                end = k + 1
+                while end < len(card) and card[end] == " ":
+                    end += 1
+                card = card[:i].rstrip() + " " + card[end:]
+        return card
+
     last_was_card = False
+    pending = None
     for raw in parm.splitlines():
         s = raw.strip()
         if s.lower().startswith(".model"):
@@ -418,11 +503,17 @@ def gen_spectre_bundle(corner: str, va_module_map: dict[str, str]) -> str:
             if va_mod is None:
                 last_was_card = False
                 continue  # hv/rf variants unused by current waves
-            o.append(_translate_model_card(s, va_mod))
+            pending = _translate_model_card(s, va_mod)
             last_was_card = True
         elif s.startswith("+") and last_was_card:
             body = " ".join(_translate_model_card("model X Y " + s[1:], "X").split()[3:])
-            o[-1] += " " + body
+            pending += " " + body
+        elif last_was_card and pending is not None:
+            o.append(_strip_geom(pending))
+            pending = None
+            last_was_card = False
+    if pending is not None:
+        o.append(_strip_geom(pending))
     return "\n".join(o) + "\n"
 
 
@@ -433,17 +524,23 @@ VA_MODULE_MAP = {
 
 
 def gen_spectre(doc: dict, corner: str, staged_names: list[str]) -> list[str]:
-    o = [f"// generated by netadapt.py --target spectre (corner {corner})",
-         f'temperature={doc["temp"]:g}']
+    o = [f"LinHT xcheck {corner} (netadapt spectre)",
+         "simulator lang=spectre",
+         f'include "models_sg13g2_{corner}.spectre"',
+         f"simopts options temp={doc['temp']:g}"]
     for nm in staged_names:
         o.append(f'include "{nm}"')
     if doc["params"]:
-        o.append("parameters " + emit_params_ngstyle(doc["params"]))
-    for ln in doc["body"]:
-        o.append(ln)
+        o.append("parameters " + debrace(emit_params_ngstyle(doc["params"])))
+    for ln in translate_staged("\n".join(doc["body"]), "spectre").splitlines():
+        s2 = ln.strip()
+        if s2.startswith("*"):
+            continue  # spectre comments are //; drop star-comments entirely
+        o.append(s2)
     for a in doc["analyses"]:
         if a["type"] == "tran":
-            o.append(f'tran1 tran stop={a["tstop"]} maxstep={a["tstep"]}')
+            o.append(f'tran1 tran stop={debrace(a["tstop"])} '
+                     f'maxstep={debrace(a["tstep"])}')
         elif a["type"] == "op":
             o.append("tran1 tran stop=1n maxstep=1n")
     return o
@@ -467,6 +564,8 @@ def adapt(tb: Path, target: str, corner: str, staging: Path,
         doc["params"] = [f"{k}={v}" for k, v in merged.items()]
     incs = resolve_includes(tb, doc["includes"])
     staged = stage_circuit_files(incs, staging)
+    if target == "spectre":
+        staged = rename_staged_for_spectre(staging, staged)
 
     # pull psp103.va next to the bundle (Spectre compiles it at run time)
     if target == "spectre":
@@ -489,7 +588,12 @@ def adapt(tb: Path, target: str, corner: str, staging: Path,
     # translate staged repo netlists into the target dialect, in place
     for n in staged:
         p = staging / n
-        p.write_text(translate_staged(p.read_text(), target))
+        body = translate_staged(p.read_text(), target)
+        if target == "spectre":
+            # each file gets its own language section (includes reset to the
+            # per-file default) and a title on line one
+            body = ("SPC staged netlist\nsimulator lang=spectre\n" + body)
+        p.write_text(body)
 
     if target == "ads":
         # canonical VM-side ADS environment; sourced by simrun's launcher
@@ -552,7 +656,8 @@ wrdata out.csv v(lo_i)
 
     # spectre bundle: cards translated, module swapped, quotes dequoted
     bun = gen_spectre_bundle("tt", VA_MODULE_MAP)
-    assert "ahdl_include" in bun and "subckt sg13_lv_nmos" in bun
+    assert "simulator lang=spectre" in bun and "subckt sg13_lv_nmos" in bun
+    assert "ahdl_include" not in bun
     assert "model sg13g2_lv_nmos_psp psp103" in bun
     assert ".model" not in bun
     assert "'-" not in bun.split("model sg13g2_lv_nmos_psp")[1][:400]

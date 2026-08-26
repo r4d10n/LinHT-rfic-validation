@@ -1,0 +1,53 @@
+{
+  "case": "lodiv_chain_ss_edge",
+  "corner": "ss",
+  "reference": {
+    "tool": "ngspice",
+    "deck": "/home/rfsoc/exp/rfic/LinHT-rfic/macros/lodiv_top/testbenches/ngspice/lodiv_chain_tb.spice"
+  },
+  "crosscheck": {
+    "tool": "hpeesofsim"
+  },
+  "signals": {
+    "lo_i": {
+      "kind": "edges",
+      "metrics": {
+        "edges_ref": 28,
+        "edges_new": 26,
+        "count_ok": false,
+        "median_skew_s": 3.8211824866425074e-10,
+        "max_skew_s": 7.136865443656915e-10,
+        "amp_ok": true,
+        "ok": false
+      },
+      "ok": false
+    },
+    "lo_q": {
+      "kind": "edges",
+      "metrics": {
+        "edges_ref": 30,
+        "edges_new": 28,
+        "count_ok": false,
+        "median_skew_s": 3.3324237644855736e-10,
+        "max_skew_s": 7.064575872945357e-10,
+        "amp_ok": true,
+        "ok": false
+      },
+      "ok": false
+    },
+    "clk_vco_div": {
+      "kind": "edges",
+      "metrics": {
+        "edges_ref": 16,
+        "edges_new": 15,
+        "count_ok": true,
+        "median_skew_s": 5.736212901882606e-10,
+        "max_skew_s": 9.352732607468662e-10,
+        "amp_ok": true,
+        "ok": false
+      },
+      "ok": false
+    }
+  },
+  "verdict": "FAIL"
+}
