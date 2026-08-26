@@ -154,3 +154,17 @@ but no Spectre-compatible PEX flow. **Status: same vendor-calibration gap.**
 
 Both gaps are fundamental consequences of using an open-source PDK without
 vendor tool calibration.
+
+## W1 supplement — non-fill GDS variant has degenerate sealring geometry
+
+Running the same 40-rule BEOL deck on `chip_top.gds` (pre-logo-fill variant)
+produces a **Calibre FATAL ERROR**: degenerate boundary (vertex count = 5) in
+cell `sealring` on layer 8 at coordinates (-2147483648, -2147483648) — the
+32-bit signed integer limit. The logo-fill variant does not exhibit this
+issue because the ArtistIC fill/logo step regenerates or removes the
+affected geometry.
+
+**Impact**: The non-fill GDS cannot pass commercial DRC sign-off without
+fixing the sealring generation in the LibreLane/OpenLane flow.
+**Classification**: Open-source flow quality gap (G-SEALRING).
+**Severity**: Blocks commercial DRC sign-off of pre-fill designs.
