@@ -406,30 +406,30 @@ parameters w=0.35e-6 l=0.34e-6 ng=1 m=1 trise=0 z1=0.34e-6 z2=0.38e-6 wmin=0.15e
 ends sg13_lv_pmos
 
 subckt rppd p n bn
-parameters w=0.5e-6 l=0.5e-6 m=1 b=0 ps=0.18e-6
+parameters w=0.5e-6 l=0.5e-6 b=0 ps=0.18e-6
   parameters weff=w+0.006e-6
-  parameters rtot=(rsh_rppd*((b+1)*l+ps*b)/weff + 2*52*0.5e-6/weff)/m
+  parameters rtot=(rsh_rppd*((b+1)*l+ps*b)/weff + 2*52*0.5e-6/weff)
   R1 (p n) resistor r=rtot tc1=0.000170 tc2=6.0e-7
 ends rppd
 
 subckt rhigh p n bn
-parameters w=0.5e-6 l=0.96e-6 m=1 b=0 ps=0.18e-6
+parameters w=0.5e-6 l=0.96e-6 b=0 ps=0.18e-6
   parameters weff=w-0.04e-6
-  parameters rtot=(rsh_rhigh*((b+1)*l+ps*b)/weff + 2*55*0.5e-6/weff)/m
+  parameters rtot=(rsh_rhigh*((b+1)*l+ps*b)/weff + 2*55*0.5e-6/weff)
   R1 (p n) resistor r=rtot tc1=-0.002300 tc2=3.0e-6
 ends rhigh
 
 subckt rsil p n bn
-parameters w=0.5e-6 l=0.5e-6 m=1 b=0 ps=0.18e-6
+parameters w=0.5e-6 l=0.5e-6 b=0 ps=0.18e-6
   parameters weff=w+0.01e-6
-  parameters rtot=(rsh_rsil*((b+1)*l+ps*b)/weff + 2*1.5*0.5e-6/weff)/m
+  parameters rtot=(rsh_rsil*((b+1)*l+ps*b)/weff + 2*1.5*0.5e-6/weff)
   R1 (p n) resistor r=rtot tc1=0.003100 tc2=2.0e-7
 ends rsil
 
 subckt cap_cmim p n
-parameters w=7e-6 l=7e-6 m=1 mm_ok=0
-  parameters ctot=(cap_carea*w*l + 40e-18*2*(w+l))*m
-  Rs (p x) resistor r=0.055/m
+parameters w=7e-6 l=7e-6 mm_ok=0
+  parameters ctot=(cap_carea*w*l*1e12 + 40e-18*2*(w+l))
+  Rs (p x) resistor r=0.055
   C1 (x n) capacitor c=ctot
 ends cap_cmim
 """

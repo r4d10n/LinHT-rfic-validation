@@ -88,12 +88,15 @@ Solved empirically en route: title-line-as-instance in included files,
 `.spc` extension = compiled-table reader (use `.scs`), `parameters` inside
 subckt bodies, model-scope geometry expressions, `sinedc` vs `dc`,
 native `psp103` shadowed by ahdl_include of the VA.
-CURRENT BLOCKER: full-macro Spectre tran completes 0-errors but DUT logic
-outputs sit at ~VDD/2 while the sine source swings correctly (span 0.4 V
-verified in psf) and rst_n releases on time. Supplies healthy. Next probe:
-spectre DC operating point of the first CML stage (tail bias node) versus
-ngspice — suspect a wrapper parameter not reaching depth (e.g. `m`
-multiplicity ignored per SFE-57, or rhigh/rppd value semantics).
+CURRENT BLOCKER (narrowed substantially): tran completes 0 errors / 28 s.
+Verified working in psf: sine drive swings (vco_p span 0.4 V), rst_n pulse,
+coupling cap conducts (dut.ccinp.x span 0.4 V), first-stage gate dut.ckAp
+swings 0.38 V after the reserved-`m` scrub. Still broken: ALL logic outputs
+(lo_i/lo_q/clk_vco_div) static at ~0.75 V and i_vdd shows no switching
+component — the chain dies inside/before stage-A latch despite valid clock.
+Next probes: (1) spectre DC op of stage-A tail node vs ngspice;
+(2) dump `dut.aq`/`dut.b` latch nodes for stuck-at level;
+(3) compare rhigh/rppd effective R in-circuit (SFE-57 m-formal semantics).
 2. W4 LVS skeleton (Calibre LVS needs a device extraction deck — bigger
    transcription than DRC subset).
 3. W5 Virtuoso stream-in audit.

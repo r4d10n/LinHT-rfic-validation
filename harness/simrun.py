@@ -121,28 +121,48 @@ def parse_ads_dataset(text: str) -> dict[str, list[float]]:
     return out
 
 
-def parse_psfascii(path: Path, want: list[str]) -> dict[str, tuple[list, list]]:
-    """psfascii tran reader (Spectre -format psfascii). VALUE holds one block
-    per timestep: `( <t> "time" ( <v> "<sig>" ) ... )`, signals in TRACE order."""
-    text = path.read_text(errors="replace")
-    m = re.search(r"\nVALUE\s*\n(.*)", text, re.S)
-    if not m:
-        raise StageError("parse:psfascii", "no VALUE section")
-    body = m.group(1)
+def parse_psfascii(path: Path, want: list[str]) -> dict[str, list[float]]:
+    """Real Spectre psfascii tran layout (verified on samjna output):
+    TRACE name/unit declarations, then a VALUE section of rows
+    `"name" value` — one row per signal per timestep, time included as
+    `"time" <t>`. Returns dict incl. "time". Only `want` (+time) kept."""
     ts: list[float] = []
-    series: dict[str, list[float]] = {}
-    for blk in re.finditer(r"\(\s*([-+\d.eE]+)\s+\"time\"\s*(.*?)\n\s*\)",
-                           body, re.S):
-        ts.append(float(blk.group(1)))
-        for val, name in re.findall(r"\(\s*([-+\d.eE]+)\s+\"([^\"]+)\"\s*\)",
-                                    blk.group(2)):
-            series.setdefault(name, []).append(float(val))
-    out = {}
-    for w in want:
-        if w not in series:
-            raise StageError("parse:spectre-vector",
-                             f"{w} not in {sorted(series)[:20]}")
-        out[w] = (ts, series[w])
+    cols: dict[str, list[float]] = {w: [] for w in want}
+    pend: dict[str, float] = {}
+    cur = None
+    n = 0
+    need = len(want)
+    in_val = False
+    for ln in path.open(errors="replace"):
+        if not in_val:
+            if ln.startswith("VALUE"):
+                in_val = True
+            continue
+        parts = ln.split('"')
+        if len(parts) >= 3:
+            name = parts[1]
+            try:
+                fv = float(parts[2])
+            except ValueError:
+                continue
+            if name == "time":
+                if cur is not None and n == need:
+                    ts.append(cur)
+                    for w in want:
+                        cols[w].append(pend[w])
+                cur = fv
+                n = 0
+            elif name in cols:
+                pend[name] = fv
+                n += 1
+    if cur is not None and n == need:
+        ts.append(cur)
+        for w in want:
+            cols[w].append(pend[w])
+    if not ts:
+        raise StageError("parse:psfascii", "no rows parsed")
+    out = {"time": ts}
+    out.update(cols)
     return out
 
 
@@ -439,8 +459,8 @@ def push_and_run_spectre(staging: Path, case: str, poll_sec: int = 10,
     while time.time() - t0 < timeout_s:
         time.sleep(poll_sec)
         _, tail = vm_ssh(
-            f"cd {remote_dir} && ls psf/*.psf >/dev/null 2>&1 && "
-            "grep -q 'completed' sim.log && echo SPC_DONE || true")
+            f"cd {remote_dir} && ls psf/tran*.tran* >/dev/null 2>&1 && "
+            "grep -q 'completes with' sim.log && echo SPC_DONE || true")
         if "SPC_DONE" in tail:
             break
         _, errs = vm_ssh(f"cd {remote_dir} && grep -c ERROR sim.log || true")
@@ -523,7 +543,7 @@ def xcheck_spectre(case: str, tb: Path, corner: str, params: dict,
         spec_name = DEFAULT_SIGNALS[s]["spectre"]
         ref = parse_ngspice_csv(lines, order.index(DEFAULT_SIGNALS[s]["ng"]))
         parsed = parse_psfascii(data_ps, [spec_name])
-        new = parsed[spec_name]
+        new = (parsed["time"], parsed[spec_name])
         if s.startswith("i_"):
             m = compare_supply(*ref, new[0], new[1],
                                mean_tol=float(sup.get("mean_tol", 0.02)),
@@ -577,6 +597,19 @@ def self_test() -> int:
     d = compare_digital(sq_t, sq, sq_t, shifted, vth=0.75,
                         max_median_skew=1e-10, max_edge_skew=5e-10)
     assert d["count_ok"] and d["median_skew_s"] <= 1e-10 and d["ok"], d
+
+    psf = """TRACE
+"lo_i" "V"
+VALUE
+"time" 0.000000000000000e+00
+"lo_i" 0.000000000000000e+00
+"time" 1.000000000000000e-09
+"lo_i" 5.000000000000000e-01
+"""
+    tmp = Path("/tmp/xcheck_psf.psf")
+    tmp.write_text(psf)
+    gotp = parse_psfascii(tmp, ["lo_i"])
+    assert gotp["time"] == [0.0, 1e-9] and gotp["lo_i"] == [0.0, 0.5], gotp
 
     got = parse_ads_dataset(DS_FIXTURE)
     assert got["time"] == [0.0, 1e-9, 2e-9], got
