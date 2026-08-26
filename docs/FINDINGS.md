@@ -12,7 +12,7 @@ Keysight ADS hpeesofsim 650.shp (2027), Cadence Spectre 25.1, Siemens Calibre
 | W1 | DRC (BEOL metal subset, 40 rule families) | chip_top_logo_fill.gds (~4M polys) | Calibre | **PASS — 0 violations, agrees with magic baseline** | `evidence/wave1_drc/report.json` |
 | W3a | Circuit tran, lodiv chain, tt/4.4 GHz/div8 | full macro TB | hpeesofsim | **PASS — edge counts equal (28/28, 30/30, 16/16); median skew 35/22/4.6 ps; i_vdd mean Δ 0.26 %** | `evidence/lodiv_chain_tt_tt_ads_report.json` |
 | W3b | Circuit tran, lodiv chain, ss/4.16 GHz edge | full macro TB | hpeesofsim | **FAIL — genuine parametric divergence**: divide topology identical (clk:lo ratio 0.49 both tools) but LO frequency differs ~6 % (ngspice 551 MHz vs ADS 519 MHz), per-edge median skew 0.33–0.57 ns | `evidence/lodiv_chain_ss_edge_ss_ads_report.json` |
-| W2 | Circuit tran via Spectre | same TB | Spectre 25.1 | **IN PROGRESS — decks fully native, elaboration clean; one CMI-3078 (SPC/bbspice) left** (see G-SPECTRE below) | `/tmp` runs + harness code |
+| W2 | Circuit tran via Spectre | same TB | Spectre 25.1 | **IN PROGRESS — pipeline green through hierarchy elaboration and 33 ns tran (0 errors); DUT outputs static at mid-rail while sources oscillate — one remaining DUT-side debug item (see G-SPECTRE)** | `evidence/logs/lodiv_chain_tt_spectre.psfascii` |
 
 ## Toolflow-gap register (missing features this work exposed)
 
@@ -83,10 +83,17 @@ supply rails → steady-state mean (±2 %) + envelope (±25 %); analog waveforms
 → smoothed L2. Pointwise L2 on square waves is explicitly rejected as a
 primary metric (device-model phase drift accumulates ~20 ps/edge).
 
-## Remaining to reach full-flow closure
-1. W2 last mile: CMI-3078 inside staged-macro include (isolated to
-   `lodiv_top.spice.spc`; bundle alone is clean). Next probe: bisect macro
-   subcircuits; suspect one statement form spectre routes to SPC.
+### G-SPECTRE — Spectre path state (W2 last mile)
+Solved empirically en route: title-line-as-instance in included files,
+`.spc` extension = compiled-table reader (use `.scs`), `parameters` inside
+subckt bodies, model-scope geometry expressions, `sinedc` vs `dc`,
+native `psp103` shadowed by ahdl_include of the VA.
+CURRENT BLOCKER: full-macro Spectre tran completes 0-errors but DUT logic
+outputs sit at ~VDD/2 while the sine source swings correctly (span 0.4 V
+verified in psf) and rst_n releases on time. Supplies healthy. Next probe:
+spectre DC operating point of the first CML stage (tail bias node) versus
+ngspice — suspect a wrapper parameter not reaching depth (e.g. `m`
+multiplicity ignored per SFE-57, or rhigh/rppd value semantics).
 2. W4 LVS skeleton (Calibre LVS needs a device extraction deck — bigger
    transcription than DRC subset).
 3. W5 Virtuoso stream-in audit.

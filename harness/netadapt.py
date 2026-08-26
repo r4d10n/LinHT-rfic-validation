@@ -137,10 +137,11 @@ def stage_circuit_files(files: list[Path], staging: Path) -> list[str]:
 
 
 def rename_staged_for_spectre(staging: Path, names: list[str]) -> list[str]:
-    """Spectre reads file language from extension: .spice would force spice."""
+    """Spectre picks the reader by extension: .spice forces SPICE mode and
+    .spc is its COMPILED-TABLE format (CMI-3078 interp=bbspice). Use .scs."""
     out = []
     for n in names:
-        src, dst = staging / n, staging / (n + ".spc")
+        src, dst = staging / n, staging / (n + ".scs")
         src.rename(dst)
         out.append(dst.name)
     return out
@@ -312,7 +313,7 @@ def translate_staged(text: str, target: str) -> str:
                 sp = "" if ph.strip() in ("0", "") else \
                     f" sinphase=({ph})*pi/180"
                 out.append(f"{name} {n1} {n2} vsource type=sine "
-                           f"dc={vo} ampl={va} freq={f_}{sp}")
+                           f"sinedc={vo} ampl={va} freq={f_}{sp}")
                 continue
             if mpulse:
                 a = debrace(mpulse.group(1)).split()
@@ -590,9 +591,10 @@ def adapt(tb: Path, target: str, corner: str, staging: Path,
         p = staging / n
         body = translate_staged(p.read_text(), target)
         if target == "spectre":
-            # each file gets its own language section (includes reset to the
-            # per-file default) and a title on line one
-            body = ("SPC staged netlist\nsimulator lang=spectre\n" + body)
+            # each include resets to its per-file default language, and an
+            # included file has NO title line (line 1 would parse as an
+            # instance — a literal 'SPC staged netlist' once did!)
+            body = ("simulator lang=spectre\n" + body)
         p.write_text(body)
 
     if target == "ads":

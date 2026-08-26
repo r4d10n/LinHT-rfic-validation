@@ -1,0 +1,64 @@
+{
+  "case": "lodiv_chain_tt",
+  "corner": "tt",
+  "reference": {
+    "tool": "ngspice",
+    "deck": "/home/rfsoc/exp/rfic/LinHT-rfic/macros/lodiv_top/testbenches/ngspice/lodiv_chain_tb.spice"
+  },
+  "crosscheck": {
+    "tool": "spectre"
+  },
+  "signals": {
+    "lo_i": {
+      "kind": "edges",
+      "metrics": {
+        "edges_ref": 28,
+        "edges_new": 0,
+        "count_ok": false,
+        "median_skew_s": Infinity,
+        "max_skew_s": Infinity,
+        "amp_ok": false,
+        "ok": false
+      },
+      "ok": false
+    },
+    "lo_q": {
+      "kind": "edges",
+      "metrics": {
+        "edges_ref": 30,
+        "edges_new": 0,
+        "count_ok": false,
+        "median_skew_s": Infinity,
+        "max_skew_s": Infinity,
+        "amp_ok": false,
+        "ok": false
+      },
+      "ok": false
+    },
+    "clk_vco_div": {
+      "kind": "edges",
+      "metrics": {
+        "edges_ref": 16,
+        "edges_new": 2,
+        "count_ok": false,
+        "median_skew_s": 1.4657906444269761e-08,
+        "max_skew_s": 2.7405707748954685e-08,
+        "amp_ok": false,
+        "ok": false
+      },
+      "ok": false
+    },
+    "i_vdd": {
+      "kind": "supply",
+      "metrics": {
+        "mean_ref_a": -0.0053351851984162445,
+        "mean_new_a": -0.0012943454030283328,
+        "mean_rel": 0.757394,
+        "envelope_dev": 0.9371,
+        "ok": false
+      },
+      "ok": false
+    }
+  },
+  "verdict": "FAIL"
+}
