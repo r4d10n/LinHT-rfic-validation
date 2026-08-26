@@ -139,3 +139,18 @@ debug step. All dialect facts above already encoded in harness/netadapt.py.
    transcription than DRC subset).
 3. W5 Virtuoso stream-in audit.
 4. G-MODEL-FIDELITY wrapper regeneration for ss-corner ADS sign-off.
+
+## W4/W5 — LVS and PEX status
+
+**LVS (W4)**: Requires a full device-extraction Calibre rule deck
+(FEOL+BEOL: MOS/RES/CAP/DIO/HBT recognition, well isolation). The BEOL
+metal subset covers interconnect only. Production LVS deck authoring is a
+multi-week reverse-engineering effort. **Status: infrastructure ready,
+deck deferred pending IHP collaboration.**
+
+**PEX (W5)**: Post-layout parasitic extraction requires calibrated RC
+coefficients per layer. The open PDK provides KLayout parasitic estimation
+but no Spectre-compatible PEX flow. **Status: same vendor-calibration gap.**
+
+Both gaps are fundamental consequences of using an open-source PDK without
+vendor tool calibration.
