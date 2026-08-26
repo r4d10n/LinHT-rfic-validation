@@ -1,0 +1,1 @@
+Commercial-tool validation of the LinHT-rfic open-source RFIC flow: cross-check Xschem->ngspice/CACE->LibreLane->GDS->DRC/LVS against Keysight ADS 2027, Cadence Spectre 25.1, and Siemens Calibre 2026.3 on IHP SG13G2.
