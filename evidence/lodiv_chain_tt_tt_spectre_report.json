@@ -52,9 +52,9 @@
       "kind": "supply",
       "metrics": {
         "mean_ref_a": -0.0053351851984162445,
-        "mean_new_a": -0.024251535399267752,
-        "mean_rel": 3.545585,
-        "envelope_dev": 0.8628,
+        "mean_new_a": -0.023753803291284986,
+        "mean_rel": 3.452292,
+        "envelope_dev": 0.2702,
         "ok": false
       },
       "ok": false

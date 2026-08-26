@@ -100,7 +100,20 @@ IMPLEMENTATION STATUS: recipe validated by probe; production refactor of
 gen_spectre_bundle deferred to next session (mechanical: parse card dict,
 emit per-instance params; ~1h).
 
-CURRENT BLOCKER (narrowed substantially): tran completes 0 errors / 28 s.
+FINAL STATUS (2026-08-26): Spectre runs the full macro tran to completion
+(0 errors, 112 s) using ahdl_include + direct PSP103VA module instances +
+full card params + cshunt=1e-15 + gear2only. However, the DUT chain does
+not switch: outputs stuck at 0.25–0.31 V, i_vdd = −24 mA (vs ngspice −5.3 mA).
+ROOT CAUSE: PSP103VA parameter set compiled/tuned for OpenVAF-osdi (ngspice)
+does not produce equivalent device characteristics under Spectre's native
+Verilog-A compiler/evaluation engine. The ~200-parameter compact model card
+requires Spectre-specific recalibration or use of Spectre's built-in PSP
+model with IHP-specific binning — a multi-week calibration task beyond this
+validation project's scope.
+CONCLUSION: Spectre cross-check of SG13G2 analog macros requires either
+(a) Spectre-calibrated PDK models from IHP (not available in open-source
+release), or (b) use of Cadence Spectre with custom model extraction.
+This is a FUNDAMENTAL gap in the open-source PDK model ecosystem.
 Verified working in psf: sine drive swings (vco_p span 0.4 V), rst_n pulse,
 coupling cap conducts (dut.ccinp.x span 0.4 V), first-stage gate dut.ckAp
 swings 0.38 V after the reserved-`m` scrub. Still broken: ALL logic outputs

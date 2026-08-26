@@ -474,9 +474,7 @@ def gen_spectre_bundle(corner: str, va_module_map: dict[str, str]) -> str:
     # NOTE: no title line — included files have no title convention, so a
     # leading "SG13G2 ..." parsed as an INSTANCE named SG13G2 (CMI-3078).
     o = ["simulator lang=spectre",
-         'ahdl_include "psp103.va"',
-         # AHDL convergence aids (PSP103VA branch flows otherwise kick kA)
-         "myopts options errpreset=conservative", ""]
+         'ahdl_include "psp103.va"', ""]
     g = corner_globals(corner)
     g.append(("pre_layout", "1"))
     o.append("parameters " + " ".join(f"{k}={v}" for k, v in g))
@@ -523,7 +521,7 @@ def gen_spectre(doc: dict, corner: str, staged_names: list[str]) -> list[str]:
     o = [f"LinHT xcheck {corner} (netadapt spectre)",
          "simulator lang=spectre",
          f'include "models_sg13g2_{corner}.spectre"',
-         f"simopts options temp={doc['temp']:g}"]
+         f"myopts options temp={doc['temp']:g} cshunt=1e-15"]
     for nm in staged_names:
         o.append(f'include "{nm}"')
     if doc["params"]:
@@ -537,7 +535,7 @@ def gen_spectre(doc: dict, corner: str, staged_names: list[str]) -> list[str]:
         if a["type"] == "tran":
             o.append(f'tran1 tran stop={debrace(a["tstop"])} '
                      f'maxstep={debrace(a["tstep"])} '
-                     f'errpreset=conservative')
+                     f'errpreset=conservative method=gear2only')
         elif a["type"] == "op":
             o.append("tran1 tran stop=1n maxstep=1n")
     return o
