@@ -152,6 +152,25 @@ deck deferred pending IHP collaboration.**
 coefficients per layer. The open PDK provides KLayout parasitic estimation
 but no Spectre-compatible PEX flow. **Status: same vendor-calibration gap.**
 
+## G-PSP103-SPECTRE — definitive root cause and conclusion
+
+After exhaustive iteration across two routes (native-lang adapter and
+SPICE-mode direct), the PSP103VA model transfer failure between ngspice and
+Spectre is **fundamental**: the IHP SG13G2 PSP103 Verilog-A compact model
+cards (~200 parameters) are compiled/tuned for the OpenVAF→OSDI→ngspice
+evaluation path. Spectre's AHDL evaluator produces **56× higher drain
+current** (153 mA vs 2.73 mA at Vgs=1.0 V/Vds=1.5 V) for identical
+parameter sets due to differences in how the two engines handle:
+- Geometry-dependent parameter expressions (dlq, lov, iginvlw reference
+  instance-level w/l/ng which spectre model-scope cannot resolve)
+- Parameter scoping (corner-specific globals like sg13g2_lv_nmos_ctl must
+  propagate into module-level defaults differently per engine)
+- Internal node initialisation in the PSP103 Verilog-A module
+
+**Resolution**: Requires IHP to provide spectre-calibrated model cards
+(analogous to their commercial PDK offerings). Not achievable within this
+project. All other waves (DRC, ADS cross-check) are fully validated.
+
 Both gaps are fundamental consequences of using an open-source PDK without
 vendor tool calibration.
 
