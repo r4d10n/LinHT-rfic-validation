@@ -195,3 +195,19 @@ affected geometry.
 fixing the sealring generation in the LibreLane/OpenLane flow.
 **Classification**: Open-source flow quality gap (G-SEALRING).
 **Severity**: Blocks commercial DRC sign-off of pre-fill designs.
+
+
+## W4/W5 status
+
+LVS (W4): Needs full device-extraction Calibre rule deck (FEOL+BEOL:
+MOS/RES/CAP/DIO/HBT recognition, well isolation). The BEOL metal subset
+covers interconnect only. Production LVS is multi-week reverse-engineering.
+Status: infrastructure ready (pvrun.py), deck deferred.
+
+PEX (W5): Requires calibrated RC coefficients per layer. The open PDK
+provides KLayout parasitic estimation but no spectre-compatible PEX flow.
+Status: same vendor-calibration gap.
+
+Both are fundamental consequences of open-source PDK without vendor tool
+calibration. All completable waves (DRC + ADS + Spectre integration) have
+been executed and documented above.
