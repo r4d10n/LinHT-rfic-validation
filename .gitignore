@@ -5,3 +5,5 @@ evidence/logs/*.tmp
 *_run/
 work/
 .jspace/
+evidence/logs/*.psfascii
+evidence/logs/*dataset.txt
