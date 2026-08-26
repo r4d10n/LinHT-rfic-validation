@@ -39,10 +39,10 @@
       "kind": "edges",
       "metrics": {
         "edges_ref": 16,
-        "edges_new": 2,
+        "edges_new": 0,
         "count_ok": false,
-        "median_skew_s": 1.4657906444269761e-08,
-        "max_skew_s": 2.7405707748954685e-08,
+        "median_skew_s": Infinity,
+        "max_skew_s": Infinity,
         "amp_ok": false,
         "ok": false
       },
@@ -52,9 +52,9 @@
       "kind": "supply",
       "metrics": {
         "mean_ref_a": -0.0053351851984162445,
-        "mean_new_a": -0.0012943454030283328,
-        "mean_rel": 0.757394,
-        "envelope_dev": 0.9371,
+        "mean_new_a": -0.024251535399267752,
+        "mean_rel": 3.545585,
+        "envelope_dev": 0.8628,
         "ok": false
       },
       "ok": false

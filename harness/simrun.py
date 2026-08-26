@@ -127,11 +127,12 @@ def parse_psfascii(path: Path, want: list[str]) -> dict[str, list[float]]:
     `"name" value` — one row per signal per timestep, time included as
     `"time" <t>`. Returns dict incl. "time". Only `want` (+time) kept."""
     ts: list[float] = []
-    cols: dict[str, list[float]] = {w: [] for w in want}
+    tracked = [w for w in want if w != "time"]
+    cols: dict[str, list[float]] = {w: [] for w in tracked}
     pend: dict[str, float] = {}
     cur = None
     n = 0
-    need = len(want)
+    need = len(tracked)
     in_val = False
     for ln in path.open(errors="replace"):
         if not in_val:
@@ -148,7 +149,7 @@ def parse_psfascii(path: Path, want: list[str]) -> dict[str, list[float]]:
             if name == "time":
                 if cur is not None and n == need:
                     ts.append(cur)
-                    for w in want:
+                    for w in tracked:
                         cols[w].append(pend[w])
                 cur = fv
                 n = 0
@@ -157,7 +158,7 @@ def parse_psfascii(path: Path, want: list[str]) -> dict[str, list[float]]:
                 n += 1
     if cur is not None and n == need:
         ts.append(cur)
-        for w in want:
+        for w in tracked:
             cols[w].append(pend[w])
     if not ts:
         raise StageError("parse:psfascii", "no rows parsed")
@@ -431,12 +432,13 @@ def push_and_run_spectre(staging: Path, case: str, poll_sec: int = 10,
     with tarfile.open(tarball, "w:gz") as tf:
         for p in staging.iterdir():
             tf.add(p, arcname=p.name)
-    vm_ssh(f"mkdir -p {remote_dir}", check=True)
+    vm_ssh(f"rm -rf {remote_dir} && mkdir -p {remote_dir}", check=True)
     cmd = ["sshpass", "-p", _vm_pass(), "ssh", "-o",
            "StrictHostKeyChecking=no", "-o", "UserKnownHostsFile=/dev/null",
            "-p", "2222", "rakesh@127.0.0.1",
            f"cat > {remote_dir}/in.tgz && cd {remote_dir} && "
-           "tar xzf in.tgz && rm in.tgz"]
+           "tar xzf in.tgz && rm in.tgz && "
+           "cp ~/linht/ads/pdk/va/*.include . 2>/dev/null; true"]
     proc = subprocess.run(cmd, input=tarball.read_bytes(), capture_output=True,
                           timeout=180)
     if proc.returncode != 0:
@@ -472,7 +474,8 @@ def push_and_run_spectre(staging: Path, case: str, poll_sec: int = 10,
         raise StageError("run:spectre", f"incomplete: {tail}")
     outdir = EVIDENCE / "logs"
     outdir.mkdir(parents=True, exist_ok=True)
-    psf_name = vm_ssh(f"cd {remote_dir} && ls psf/")[1].split()[0]
+    psf_name = next(n for n in vm_ssh(f"cd {remote_dir} && ls psf/")[1].split()
+                    if n.startswith("tran"))
     blob = vm_pull(f"{remote_dir}/psf/{psf_name}")
     (outdir / f"{case}_spectre.psfascii").write_bytes(blob)
     log = vm_ssh(f"cat {remote_dir}/sim.log")[1] + "\n"

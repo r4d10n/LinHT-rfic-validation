@@ -109,6 +109,15 @@ component — the chain dies inside/before stage-A latch despite valid clock.
 Next probes: (1) spectre DC op of stage-A tail node vs ngspice;
 (2) dump `dut.aq`/`dut.b` latch nodes for stuck-at level;
 (3) compare rhigh/rppd effective R in-circuit (SFE-57 m-formal semantics).
+
+ROUTE B (parallel track, also documented): run the ORIGINAL ngspice deck
+under `spectre` SPICE-language mode + psp103va.osdi (module compiled via
+IHP openvaf recipe; registered by osdi FILE BASENAME — psp103va.va builds
+module psp103va matching the lib token). Blockers measured: $PDK_ROOT env
+paths unexpanded (use absolute), .control blocks rejected (strip; metrics
+are host-side anyway), {brace} expressions need rewriting. Both routes are
+1-2 focused sessions from closure; all dialect facts above already encoded
+in harness/netadapt.py.
 2. W4 LVS skeleton (Calibre LVS needs a device extraction deck — bigger
    transcription than DRC subset).
 3. W5 Virtuoso stream-in audit.

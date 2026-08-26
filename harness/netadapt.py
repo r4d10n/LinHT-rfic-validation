@@ -377,34 +377,8 @@ def gen_ads(doc: dict, corner: str, extra_defs: list[str]) -> list[str]:
 
 
 _SPECTRE_WRAPPERS = """
-// IHP device wrappers, Spectre dialect (grammar verified on samjna:
-// subckt NAME nodes... / body parameters line / ends NAME).
-subckt sg13_lv_nmos d g s b
-parameters w=0.35e-6 l=0.34e-6 ng=1 m=1 trise=0 z1=0.34e-6 z2=0.38e-6 wmin=0.15e-6
-  parameters wf=max(w/ng,wmin)
-  parameters odd=(floor(floor(ng/2+0.501)*2+0.001) != ng)
-  parameters as_o=wf*(z1+((ng-1)/2)*z2)
-  parameters ps_o=2*(wf*((ng-1)/2+1)+z1+(ng-1)/2*z2)
-  parameters as_e=wf*(2*z1+max(0,(ng-2)/2)*z2)
-  parameters ad_e=wf*z2/2*ng
-  parameters ps_e=2*(wf*(2+max(ng-2,0)/2)+2*z1+max(ng-2,0)/2*z2)
-  parameters pd_e=(wf+z2)*ng
-  N1 (d g s b) sg13g2_lv_nmos_psp w=w l=l nf=ng mult=m as=(odd ? as_o : as_e) ad=(odd ? as_o : ad_e) ps=(odd ? ps_o : ps_e) pd=(odd ? ps_o : pd_e) dta=trise ngcon=2 delvto=0 factuo=1
-ends sg13_lv_nmos
-
-subckt sg13_lv_pmos d g s b
-parameters w=0.35e-6 l=0.34e-6 ng=1 m=1 trise=0 z1=0.34e-6 z2=0.38e-6 wmin=0.15e-6
-  parameters wf=max(w/ng,wmin)
-  parameters odd=(floor(floor(ng/2+0.501)*2+0.001) != ng)
-  parameters as_o=wf*(z1+((ng-1)/2)*z2)
-  parameters ps_o=2*(wf*((ng-1)/2+1)+z1+(ng-1)/2*z2)
-  parameters as_e=wf*(2*z1+max(0,(ng-2)/2)*z2)
-  parameters ad_e=wf*z2/2*ng
-  parameters ps_e=2*(wf*(2+max(ng-2,0)/2)+2*z1+max(ng-2,0)/2*z2)
-  parameters pd_e=(wf+z2)*ng
-  N1 (d g s b) sg13g2_lv_pmos_psp w=w l=l nf=ng mult=m as=(odd ? as_o : as_e) ad=(odd ? as_o : ad_e) ps=(odd ? ps_o : ps_e) pd=(odd ? ps_o : pd_e) dta=trise ngcon=2 delvto=0 factuo=1
-ends sg13_lv_pmos
-
+// PDK R/C wrappers, Spectre dialect (formulas mirror ihp2ads.py;
+// cap area term uses *1e12: cap_carea is per um^2, w/l are meters).
 subckt rppd p n bn
 parameters w=0.5e-6 l=0.5e-6 b=0 ps=0.18e-6
   parameters weff=w+0.006e-6
@@ -456,66 +430,87 @@ def _translate_model_card(line: str, va_module: str) -> str:
     return f"model {name} {va_module} " + " ".join(toks)
 
 
+def _parm_text() -> str:
+    return (PDK_REF / "sg13g2_moslv_parm.lib").read_text(errors="replace")
+
+
+def _parse_card_params(parm_text: str, model_name: str) -> dict[str, str]:
+    """Full parameter dict of one .model card ('+' continuations joined).
+    TYPE token normalized to ±1 numeric; everything else kept verbatim."""
+    out: dict[str, str] = {}
+    grab = False
+    for raw in parm_text.splitlines():
+        st = raw.strip()
+        if not st:
+            continue
+        low = st.lower()
+        if low.startswith(".model"):
+            grab = len(st.split()) > 1 and                 st.split()[1].lower() == model_name.lower()
+            continue
+        if not grab:
+            continue
+        rest = st[1:] if st.startswith("+") else ""
+        if not st.startswith("+") and not low.startswith(".model"):
+            break
+        body = rest if st.startswith("+") else st
+        for kv in re.finditer(r"([A-Za-z_]\w*)\s*=\s*('[^']*'|[^\s]+)", body):
+            k, v = kv.group(1), kv.group(2)
+            if k.lower() == "type":
+                v = ("1" if v.lstrip("+-").isdigit() and v.startswith("+")
+                     else ("-1" if v.lstrip("+-").isdigit() and v.startswith("-")
+                           else v))
+                v = v.lstrip("+")
+            out[k.upper()] = v.strip("'")
+        if not st.startswith("+"):
+            break
+    return out
+
+
 def gen_spectre_bundle(corner: str, va_module_map: dict[str, str]) -> str:
-    """Generate models_sg13g2_<corner>.spectre from vendored PDK libs."""
-    # NOTE: no ahdl_include — Spectre 25.1 has a native `psp103` primitive;
-    # including the VA shadowed it and broke initial setup (CMI-3078).
-    o = ["simulator lang=spectre", ""]
+    """models_sg13g2_<corner>.spectre: corner globals + R/C wrappers.
+    MOS devices instantiate the PSP103VA Verilog-A module DIRECTLY with the
+    full card parameter set per instance — Spectre's native `psp103`
+    primitive mis-scales these VA-derived cards by >50x (measured)."""
+    # NOTE: no title line — included files have no title convention, so a
+    # leading "SG13G2 ..." parsed as an INSTANCE named SG13G2 (CMI-3078).
+    o = ["simulator lang=spectre",
+         'ahdl_include "psp103.va"',
+         # AHDL convergence aids (PSP103VA branch flows otherwise kick kA)
+         "myopts options errpreset=conservative", ""]
     g = corner_globals(corner)
     g.append(("pre_layout", "1"))
     o.append("parameters " + " ".join(f"{k}={v}" for k, v in g))
     o.append("")
-    o.append(_SPECTRE_WRAPPERS)
-    o.append("// ---- PSP103 VA model cards (from sg13g2_moslv_parm.lib) ----")
-    parm = (PDK_REF / "sg13g2_moslv_parm.lib").read_text(errors="replace")
-    def _strip_geom(card: str) -> str:
-        """Remove geometry-dependent model params (balanced-paren aware;
-        spectre evaluates model-scope exprs without w/l/ng)."""
-        for key in ("iginvlw", "cfrw"):
-            while True:
-                i = card.find(key + "=")
-                if i < 0:
-                    break
-                j = card.find("(", i)
-                if j < 0:
-                    break
-                depth, k = 0, j
-                while k < len(card):
-                    if card[k] == "(":
-                        depth += 1
-                    elif card[k] == ")":
-                        depth -= 1
-                        if depth == 0:
-                            break
-                    k += 1
-                end = k + 1
-                while end < len(card) and card[end] == " ":
-                    end += 1
-                card = card[:i].rstrip() + " " + card[end:]
-        return card
 
-    last_was_card = False
-    pending = None
-    for raw in parm.splitlines():
-        s = raw.strip()
-        if s.lower().startswith(".model"):
-            modname = s.split()[1].lower()
-            va_mod = va_module_map.get(modname)
-            if va_mod is None:
-                last_was_card = False
-                continue  # hv/rf variants unused by current waves
-            pending = _translate_model_card(s, va_mod)
-            last_was_card = True
-        elif s.startswith("+") and last_was_card:
-            body = " ".join(_translate_model_card("model X Y " + s[1:], "X").split()[3:])
-            pending += " " + body
-        elif last_was_card and pending is not None:
-            o.append(_strip_geom(pending))
-            pending = None
-            last_was_card = False
-    if pending is not None:
-        o.append(_strip_geom(pending))
+    parm = _parm_text()
+    for sub, mdl in (("sg13_lv_nmos", "sg13g2_lv_nmos_psp"),
+                     ("sg13_lv_pmos", "sg13g2_lv_pmos_psp")):
+        card = _parse_card_params(parm, mdl)
+        for k in ("W", "L", "NF", "MULT", "AS", "AD", "PS", "PD", "DTA",
+                  "NGCON", "DELVTO", "FACTUO"):
+            card.pop(k, None)          # supplied explicitly below
+        o.append(f"subckt {sub} d g s b")
+        o.append("parameters w=0.35e-6 l=0.34e-6 ng=1 trise=0 "
+                 "z1=0.34e-6 z2=0.38e-6 wmin=0.15e-6")
+        o.append("  parameters wf=max(w/ng,wmin)")
+        o.append("  parameters odd=(floor(floor(ng/2+0.501)*2+0.001) != ng)")
+        o.append("  parameters as_o=wf*(z1+((ng-1)/2)*z2)")
+        o.append("  parameters ps_o=2*(wf*((ng-1)/2+1)+z1+(ng-1)/2*z2)")
+        o.append("  parameters as_e=wf*(2*z1+max(0,(ng-2)/2)*z2)")
+        o.append("  parameters ad_e=wf*z2/2*ng")
+        o.append("  parameters ps_e=2*(wf*(2+max(ng-2,0)/2)+2*z1+max(ng-2,0)/2*z2)")
+        o.append("  parameters pd_e=(wf+z2)*ng")
+        kv = " ".join(f"{k}={v}" for k, v in sorted(card.items()))
+        o.append(f"  N1 (d g s b) PSP103VA W=w L=l NF=ng AS=(odd ? as_o : as_e)"
+                 f" AD=(odd ? as_o : ad_e) PS=(odd ? ps_o : ps_e)"
+                 f" PD=(odd ? ps_o : pd_e) DTA=trise NGCON=2 DELVTO=0"
+                 f" FACTUO=1 {kv}")
+        o.append(f"ends {sub}")
+        o.append("")
+    o.append(_SPECTRE_WRAPPERS)
     return "\n".join(o) + "\n"
+
+
 
 
 VA_MODULE_MAP = {
@@ -541,7 +536,8 @@ def gen_spectre(doc: dict, corner: str, staged_names: list[str]) -> list[str]:
     for a in doc["analyses"]:
         if a["type"] == "tran":
             o.append(f'tran1 tran stop={debrace(a["tstop"])} '
-                     f'maxstep={debrace(a["tstep"])}')
+                     f'maxstep={debrace(a["tstep"])} '
+                     f'errpreset=conservative')
         elif a["type"] == "op":
             o.append("tran1 tran stop=1n maxstep=1n")
     return o
@@ -658,11 +654,16 @@ wrdata out.csv v(lo_i)
 
     # spectre bundle: cards translated, module swapped, quotes dequoted
     bun = gen_spectre_bundle("tt", VA_MODULE_MAP)
-    assert "simulator lang=spectre" in bun and "subckt sg13_lv_nmos" in bun
-    assert "ahdl_include" not in bun
-    assert "model sg13g2_lv_nmos_psp psp103" in bun
+    assert "ahdl_include \"psp103.va\"" in bun
+    assert "subckt sg13_lv_nmos d g s b" in bun
+    assert "N1 (d g s b) PSP103VA W=w L=l NF=ng" in bun
+    assert "pre_layout=1" in bun            # feeds dlq/lov expressions
+    assert ".model" not in bun and "model sg13g2" not in bun
     assert ".model" not in bun
-    assert "'-" not in bun.split("model sg13g2_lv_nmos_psp")[1][:400]
+    n1_line = [l for l in bun.splitlines()
+               if "N1 (d g s b) PSP103VA" in l][0]
+    assert "'" not in n1_line, n1_line[:200]
+    assert "DLQ=" in n1_line and "IGINVLW" in n1_line.upper()
 
     print(json.dumps({"self_test": "pass"}, indent=2))
     return 0
